@@ -2,14 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+Route::any('/', function () {
     return view('welcome');
 });
 
-Route::get('/setup', function () {
+Route::any('/setup', function () {
     return view('welcome');
 });
 
-Route::get('/settings', function () {
+Route::any('/settings', function () {
     return view('welcome');
 });
