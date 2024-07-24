@@ -14,6 +14,11 @@ return [
     |
     */
 
+    'bitrix24' => [
+        'client_id' => 'app.669d61cfea6ff5.04279287',
+        'client_secret' => 'EFMeG7e2A6tSyUpojCshbqT34RCGcHp4Ta2GhnCOd3MCrd1p1E',
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
