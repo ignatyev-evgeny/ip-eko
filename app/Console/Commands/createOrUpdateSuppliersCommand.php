@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Deals;
 use App\Models\Integration;
 use App\Models\Supplier;
 use Illuminate\Console\Command;
