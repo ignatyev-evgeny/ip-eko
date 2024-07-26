@@ -150,6 +150,7 @@
         const table = $('#example').DataTable({
             scrollX: true,
             pageLength: 100,
+            processing: true,
             ajax: '{{ route('write-off.data') }}',
             columns: [
                 { data: 'external' },

@@ -36,6 +36,7 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
 
     Route::name('contract.')->prefix('contract')->group(function () {
         Route::get('/list', [ContractController::class, 'list'])->name('list');
+        Route::get('/data', [ContractController::class, 'data'])->name('data');
         Route::get('/getNames', [ContractController::class, 'getNames'])->name('getNames');
     });
 

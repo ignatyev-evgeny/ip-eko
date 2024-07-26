@@ -73,43 +73,6 @@
             </tr>
             </thead>
             <tbody>
-            @foreach($contracts as $contract)
-                <tr>
-                    <td><a target="_blank" href="https://ip-eko.bitrix24.ru/page/kontragenty/dogovory_s_klientom/type/172/details/{{ $contract->bitrix_id }}/">{{ $contract->title }}</a></td>
-                    <td>{{ $contract->balance }}</td>
-                    <td>{{ $contract->recommended_payment }}</td>
-                    <td>{{ $contract->previous_period_amount }}</td>
-                    <td>{{ $contract->type }}</td>
-                    <td>{{ $contract->number }}</td>
-                    <td>{{ $contract->date }}</td>
-                    <td>{{ $contract->phone }}</td>
-                    <td>{{ $contract->create_deals }}</td>
-                    <td>{{ $contract->export_start_date }}</td>
-                    <td>{{ is_array($contract->export_week_days) ? implode(', ', $contract->export_week_days) : '' }}</td>
-                    <td>{{ $contract->export_frequency }}</td>
-                    <td>{{ $contract->payment_total }}</td>
-                    <td>{{ $contract->payment_type }}</td>
-                    <td>{{ $contract->export_total_count }}</td>
-                    <td>{{ $contract->attorney_date }}</td>
-                    <td>{{ $contract->price }}</td>
-                    <td>{{ $contract->price_fruits_vegetables }}</td>
-                    <td>{{ $contract->price_bakery }}</td>
-                    <td>{{ $contract->price_dairy }}</td>
-                    <td>{{ $contract->price_used_oil }}</td>
-                    <td>{{ $contract->price_grocery }}</td>
-                    <td>{{ $contract->price_waste }}</td>
-                    <td>{{ $contract->other }}</td>
-                    <td>{{ $contract->city }}</td>
-                    <td>{{ $contract->status }}</td>
-                    <td>{{ $contract->shipment }}</td>
-                    <td>{{ $contract->process }}</td>
-                    <td>{{ $contract->supplier_registered }}</td>
-                    <td>{{ $contract->retailer }}</td>
-                    <td>{{ $contract->region }}</td>
-                    <td>{{ $contract->balance_status }}</td>
-                    <td>{{ $contract->source }}</td>
-                </tr>
-            @endforeach
             </tbody>
         </table>
 
@@ -128,7 +91,43 @@
         const table = $('#contracts').DataTable({
             scrollX: true,
             pageLength: 100,
-            // ordering: false,
+            processing: true,
+            ajax: '{{ route('contract.data') }}',
+            columns: [
+                { data: 'title' },
+                { data: 'balance' },
+                { data: 'recommended_payment' },
+                { data: 'previous_period_amount' },
+                { data: 'type' },
+                { data: 'number' },
+                { data: 'date' },
+                { data: 'phone' },
+                { data: 'create_deals' },
+                { data: 'export_start_date' },
+                { data: 'export_week_days' },
+                { data: 'export_frequency' },
+                { data: 'payment_total' },
+                { data: 'payment_type' },
+                { data: 'export_total_count' },
+                { data: 'attorney_date' },
+                { data: 'price' },
+                { data: 'price_fruits_vegetables' },
+                { data: 'price_bakery' },
+                { data: 'price_dairy' },
+                { data: 'price_used_oil' },
+                { data: 'price_grocery' },
+                { data: 'price_waste' },
+                { data: 'other' },
+                { data: 'city' },
+                { data: 'status' },
+                { data: 'shipment' },
+                { data: 'process' },
+                { data: 'supplier_registered' },
+                { data: 'retailer' },
+                { data: 'region' },
+                { data: 'balance_status' },
+                { data: 'source' },
+            ],
             language: {
                 url: "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"
             }

@@ -153,6 +153,7 @@
             scrollX: true,
             pageLength: 100,
             ajax: '{{ route('entry.data') }}',
+            processing: true,
             columns: [
                 { data: 'status' },
                 { data: 'datetime' },
