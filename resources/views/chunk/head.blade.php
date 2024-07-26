@@ -1,0 +1,11 @@
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IP-EKO</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
+    <link href="{{ asset('assets/dist/css/bootstrap.min.css')  }}" rel="stylesheet">
+    <link href="{{ asset('assets/dist/css/app.css') }}" rel="stylesheet">
+    <script src="{{ asset('assets/dist/js/bootstrap.bundle.min.js') }}"></script>
+    @include('chunk.datatable')
+    <script src="//api.bitrix24.com/api/v1/"></script>
+</head>
