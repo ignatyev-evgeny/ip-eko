@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ContractController;
 use App\Http\Controllers\EntryController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\SetupController;
@@ -23,6 +24,10 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
 
     Route::name('client.')->prefix('client')->group(function () {
         Route::get('/list', [ClientController::class, 'list'])->name('list');
+    });
+
+    Route::name('contract.')->prefix('contract')->group(function () {
+        Route::get('/list', [ContractController::class, 'list'])->name('list');
     });
 
 
