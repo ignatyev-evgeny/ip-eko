@@ -28,8 +28,8 @@
             <li class="nav-item"><a href="{{ route('supplier.list') }}" class="nav-link" >Поставщики</a></li>
             <li class="nav-item"><a href="{{ route('client.list') }}" class="nav-link">Клиенты</a></li>
             <li class="nav-item"><a href="{{ route('contract.list') }}" class="nav-link">Договоры</a></li>
-            <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Поступления</a></li>
-            <li class="nav-item"><a href="{{ route('write-off.list') }}" class="nav-link">Списания</a></li>
+            <li class="nav-item"><a href="{{ route('entry.list') }}" class="nav-link" >Поступления</a></li>
+            <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Списания</a></li>
         </ul>
     </header>
 </div>
@@ -38,38 +38,49 @@
 
         <p class="d-inline-flex gap-1 w-100">
             <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                Добавить поступление
+                Добавить списание
             </button>
         </p>
+
         <div class="collapse mb-5" id="collapseExample">
-            <form id="entryForm">
+            <form id="writeOffForm">
                 <div class="card card-body">
                     <div class="row">
                         <div class="col-4">
                             <div class="mb-3">
-                                <label for="status" class="form-label">Статус</label>
-                                <input type="text" class="form-control" name="status" id="status">
+                                <label for="external" class="form-label">Внешний №</label>
+                                <input type="text" class="form-control" name="external" id="external">
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="mb-3">
-                                <label for="datetime" class="form-label">Дата платежа</label>
-                                <input type="datetime-local" name="datetime" class="form-control" id="datetime">
+                                <label for="date" class="form-label">Дата</label>
+                                <input type="datetime-local" name="date" class="form-control" id="date">
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="mb-3">
-                                <label for="number" class="form-label">Номер</label>
-                                <input type="text" class="form-control" name="number" id="number">
+                                <label for="store" class="form-label">Магазин</label>
+                                <input type="text" class="form-control" name="store" id="store">
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-4">
                             <div class="mb-3">
-                                <label for="amount" class="form-label">Поступило</label>
+                                <label for="total_weight" class="form-label">Отгружено</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="amount" id="amount">
+                                    <input type="text" class="form-control" name="total_weight" id="total_weight">
+                                    <span class="input-group-text">кг.</span>
+                                    <span class="input-group-text">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label for="total_amount" class="form-label">Сумма</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="total_amount" id="total_amount">
                                     <span class="input-group-text">₽</span>
                                     <span class="input-group-text">0.00</span>
                                 </div>
@@ -81,36 +92,24 @@
                                 <input type="text" class="form-control" name="counteragent" id="counteragent">
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label for="counteragent_bank_account" class="form-label">Контрагент р/с</label>
-                                <input type="text" class="form-control" name="counteragent_bank_account" id="counteragent_bank_account">
-                            </div>
-                        </div>
                     </div>
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-6">
                             <label for="contract" class="form-label">Договор</label>
                             <input type="text" class="form-control contractInput" name="contract" id="contract" aria-describedby="contractInput">
                             <div class="mb-3"></div>
                         </div>
 
-                        <div class="col-4">
+                        <div class="col-6">
                             <div class="mb-3">
-                                <label for="payment_purpose" class="form-label">Назначение платежа</label>
-                                <input type="text" class="form-control" name="payment_purpose" id="payment_purpose">
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label for="operation_type" class="form-label">Вид операции</label>
-                                <input type="text" class="form-control" name="operation_type" id="operation_type">
+                                <label for="retailer" class="form-label">Ретейлер</label>
+                                <input type="text" class="form-control" name="retailer" id="retailer">
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-12">
-                            <button type="submit" class="btn btn-success w-100">Добавить новое поступление</button>
+                            <button type="submit" class="btn btn-success w-100">Добавить новое списание</button>
                         </div>
                     </div>
                 </div>
@@ -120,15 +119,14 @@
         <table id="example" class="table table-striped" style="width:100%">
             <thead>
             <tr>
-                <th>Статус</th>
-                <th>Дата платежа</th>
-                <th>Номер</th>
-                <th>Поступление</th>
+                <th>Внешний №</th>
+                <th>Дата</th>
+                <th>Магазин</th>
+                <th>Отгружено</th>
+                <th>Сумма</th>
                 <th>Контрагент</th>
-                <th>Контрагент р/с</th>
                 <th>Договор</th>
-                <th>Назначение</th>
-                <th>Операция</th>
+                <th>Ретейлер</th>
             </tr>
             </thead>
             <tbody>
@@ -152,30 +150,29 @@
         const table = $('#example').DataTable({
             scrollX: true,
             pageLength: 100,
-            ajax: '{{ route('entry.data') }}',
+            ajax: '{{ route('write-off.data') }}',
             columns: [
-                { data: 'status' },
-                { data: 'datetime' },
-                { data: 'number' },
-                { data: 'amount' },
+                { data: 'external' },
+                { data: 'store' },
+                { data: 'date' },
+                { data: 'total_weight' },
+                { data: 'total_amount' },
                 { data: 'counteragent' },
-                { data: 'counteragent_bank_account' },
                 { data: 'contract' },
-                { data: 'payment_purpose' },
-                { data: 'operation_type' }
+                { data: 'retailer' },
             ],
             language: {
                 url: "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"
             }
         });
 
-        $('#entryForm').on('submit', function(event) {
+        $('#writeOffForm').on('submit', function(event) {
             event.preventDefault(); // Предотвращаем стандартное поведение формы
 
             var formData = $(this).serialize();
 
             $.ajax({
-                url: '{{ route('entry.store') }}',
+                url: '{{ route('write-off.store') }}',
                 method: 'POST',
                 data: formData,
                 success: function(response) {
