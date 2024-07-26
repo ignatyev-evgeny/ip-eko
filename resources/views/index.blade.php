@@ -11,7 +11,7 @@
             <li class="nav-item"><a href="{{ route('client.list') }}" class="nav-link">Клиенты</a></li>
             <li class="nav-item"><a href="{{ route('contract.list') }}" class="nav-link">Договоры</a></li>
             <li class="nav-item"><a href="{{ route('entry.list') }}" class="nav-link">Поступления</a></li>
-            <li class="nav-item"><a href="#" class="nav-link">Списания</a></li>
+            <li class="nav-item"><a href="{{ route('write-off.list') }}" class="nav-link">Списания</a></li>
         </ul>
     </header>
 </div>

@@ -6,6 +6,7 @@ use App\Http\Controllers\EntryController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\WriteOffController;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,12 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
         Route::get('/list', [EntryController::class, 'list'])->name('list');
         Route::get('/data', [EntryController::class, 'data'])->name('data');
         Route::post('/store', [EntryController::class, 'store'])->name('store');
+    });
+
+    Route::name('write-off.')->prefix('write-off')->group(function () {
+        Route::get('/list', [WriteOffController::class, 'list'])->name('list');
+        Route::get('/data', [WriteOffController::class, 'data'])->name('data');
+        Route::post('/store', [WriteOffController::class, 'store'])->name('store');
     });
 
     Route::name('supplier.')->prefix('supplier')->group(function () {
