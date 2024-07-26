@@ -15,6 +15,7 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
 
     Route::name('entry.')->prefix('entry')->group(function () {
         Route::get('/list', [EntryController::class, 'list'])->name('list');
+        Route::get('/data', [EntryController::class, 'data'])->name('data');
         Route::post('/store', [EntryController::class, 'store'])->name('store');
     });
 
@@ -28,6 +29,7 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
 
     Route::name('contract.')->prefix('contract')->group(function () {
         Route::get('/list', [ContractController::class, 'list'])->name('list');
+        Route::get('/getNames', [ContractController::class, 'getNames'])->name('getNames');
     });
 
 
