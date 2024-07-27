@@ -46,25 +46,30 @@
                 <div class="card card-body">
                     <div class="row">
                         <div class="col-4">
+                            <label for="contract" class="form-label">Договор</label>
+                            <input type="text" class="form-control contractInput" name="contract" id="contract" aria-describedby="contractInput">
+                            <div class="mb-3"></div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label for="counteragent" class="form-label">Контрагент (Клиент)</label>
+                                <input type="text" class="form-control" name="counteragent" id="counteragent">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label for="counteragent_bank_account" class="form-label">Контрагент (Клиента) р/с</label>
+                                <input type="text" class="form-control" name="counteragent_bank_account" id="counteragent_bank_account">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
                             <div class="mb-3">
                                 <label for="status" class="form-label">Статус</label>
                                 <input type="text" class="form-control" name="status" id="status">
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label for="datetime" class="form-label">Дата платежа</label>
-                                <input type="datetime-local" name="datetime" class="form-control" id="datetime">
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label for="number" class="form-label">Номер</label>
-                                <input type="text" class="form-control" name="number" id="number">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="col-4">
                             <div class="mb-3">
                                 <label for="amount" class="form-label">Поступило</label>
@@ -77,24 +82,18 @@
                         </div>
                         <div class="col-4">
                             <div class="mb-3">
-                                <label for="counteragent" class="form-label">Контрагент</label>
-                                <input type="text" class="form-control" name="counteragent" id="counteragent">
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label for="counteragent_bank_account" class="form-label">Контрагент р/с</label>
-                                <input type="text" class="form-control" name="counteragent_bank_account" id="counteragent_bank_account">
+                                <label for="datetime" class="form-label">Дата платежа</label>
+                                <input type="datetime-local" name="datetime" class="form-control" id="datetime">
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-4">
-                            <label for="contract" class="form-label">Договор</label>
-                            <input type="text" class="form-control contractInput" name="contract" id="contract" aria-describedby="contractInput">
-                            <div class="mb-3"></div>
+                            <div class="mb-3">
+                                <label for="number" class="form-label">Номер</label>
+                                <input type="text" class="form-control" name="number" id="number">
+                            </div>
                         </div>
-
                         <div class="col-4">
                             <div class="mb-3">
                                 <label for="payment_purpose" class="form-label">Назначение платежа</label>

@@ -9,11 +9,11 @@ class EntryStoreRequest extends FormRequest {
         return [
             'status' => 'required|string|max:255',
             'datetime' => 'required|date',
-            'number' => 'required|string|max:255',
+            'number' => 'nullable|string|max:255',
             'amount' => 'required|numeric',
-            'counteragent' => 'required|string|max:255',
-            'counteragent_bank_account' => 'required|string|max:255',
-            'contract' => 'required|string|max:255',
+            'counteragent' => 'nullable|string|max:255',
+            'counteragent_bank_account' => 'nullable|string|max:255',
+            'contract' => 'nullable|string|max:255',
             'payment_purpose' => 'required|string|max:255',
             'operation_type' => 'required|string|max:255',
         ];

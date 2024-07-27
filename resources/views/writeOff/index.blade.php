@@ -46,26 +46,25 @@
             <form id="writeOffForm">
                 <div class="card card-body">
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-6">
+                            <label for="contract" class="form-label">Договор</label>
+                            <input type="text" class="form-control contractInput" name="contract" id="contract" aria-describedby="contractInput">
+                            <div class="mb-3"></div>
+                        </div>
+                        <div class="col-6">
                             <div class="mb-3">
-                                <label for="external" class="form-label">Внешний №</label>
-                                <input type="text" class="form-control" name="external" id="external">
+                                <label for="retailer" class="form-label">Ретейлер</label>
+                                <input type="text" class="form-control" name="retailer" id="retailer">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-4">
                             <div class="mb-3">
                                 <label for="date" class="form-label">Дата</label>
                                 <input type="datetime-local" name="date" class="form-control" id="date">
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label for="store" class="form-label">Магазин</label>
-                                <input type="text" class="form-control" name="store" id="store">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="col-4">
                             <div class="mb-3">
                                 <label for="total_weight" class="form-label">Отгружено</label>
@@ -86,24 +85,24 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label for="counteragent" class="form-label">Контрагент</label>
-                                <input type="text" class="form-control" name="counteragent" id="counteragent">
-                            </div>
-                        </div>
                     </div>
                     <div class="row">
-                        <div class="col-6">
-                            <label for="contract" class="form-label">Договор</label>
-                            <input type="text" class="form-control contractInput" name="contract" id="contract" aria-describedby="contractInput">
-                            <div class="mb-3"></div>
-                        </div>
-
-                        <div class="col-6">
+                        <div class="col-4">
                             <div class="mb-3">
-                                <label for="retailer" class="form-label">Ретейлер</label>
-                                <input type="text" class="form-control" name="retailer" id="retailer">
+                                <label for="external" class="form-label">Номер магазина</label>
+                                <input type="text" class="form-control" name="external" id="external">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label for="store" class="form-label">Адрес магазина</label>
+                                <input type="text" class="form-control" name="store" id="store">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label for="counteragent" class="form-label">Контрагент (Клиент)</label>
+                                <input type="text" class="form-control" name="counteragent" id="counteragent">
                             </div>
                         </div>
                     </div>
