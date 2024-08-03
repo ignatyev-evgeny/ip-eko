@@ -11,8 +11,13 @@ class WriteOff extends Model {
         'date',
         'total_weight',
         'total_amount',
+        'total_detail',
         'counteragent',
         'contract',
         'retailer',
+    ];
+
+    protected $casts = [
+        'total_detail' => 'array'
     ];
 }

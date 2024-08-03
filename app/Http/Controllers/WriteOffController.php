@@ -31,7 +31,7 @@ class WriteOffController extends Controller {
                 return number_format($row->total_weight, 2, '.', ' ').' кг.';
             })
             ->addColumn('actions', function($row) {
-                return '<button data-write-off-id="'.$row->id.'" type="button" class="btn btn-primary m-0 text-start changeRow"><i class="fa-solid fa-pen-to-square"></i></button>';
+                return '<button data-write-off-id="'.$row->id.'" type="button" class="btn btn-warning m-0 text-start changeRow"><i class="fa-solid fa-pen-to-square"></i></button>';
             })
             ->rawColumns(['actions'])
             ->make(true);
@@ -47,6 +47,29 @@ class WriteOffController extends Controller {
 
     public function store(WriteOffRequest $request) {
         $data = $request->validated();
+
+        $data['total_detail'] = [
+            'fruits_amount' => $data['fruits_amount'] ?? 0,
+            'fruits_weight' => $data['fruits_weight'] ?? 0,
+            'bread_amount' => $data['bread_amount'] ?? 0,
+            'bread_weight' => $data['bread_weight'] ?? 0,
+            'milk_amount' => $data['milk_amount'] ?? 0,
+            'milk_weight' => $data['milk_weight'] ?? 0,
+            'food_waste_amount' => $data['food_waste_amount'] ?? 0,
+            'food_waste_weight' => $data['food_waste_weight'] ?? 0,
+            'used_vegetable_oil_amount' => $data['used_vegetable_oil_amount'] ?? 0,
+            'used_vegetable_oil_weight' => $data['used_vegetable_oil_weight'] ?? 0,
+            'groceries_amount' => $data['groceries_amount'] ?? 0,
+            'groceries_weight' => $data['groceries_weight'] ?? 0,
+            'other_amount' => $data['other_amount'] ?? 0,
+            'other_weight' => $data['other_weight'] ?? 0,
+        ];
+
+        if(empty($data['total_weight'])) {
+            $data['total_weight'] = $data['total_detail']['fruits_weight'] + $data['total_detail']['bread_weight'] + $data['total_detail']['milk_weight'] + $data['total_detail']['food_waste_weight'] + $data['total_detail']['used_vegetable_oil_weight'] + $data['total_detail']['groceries_weight'] + $data['total_detail']['other_weight'];
+            $data['total_amount'] = $data['total_detail']['fruits_amount'] + $data['total_detail']['bread_amount'] + $data['total_detail']['milk_amount'] + $data['total_detail']['food_waste_amount'] + $data['total_detail']['used_vegetable_oil_amount'] + $data['total_detail']['groceries_amount'] + $data['total_detail']['other_amount'];
+        }
+
         $writeoff = WriteOff::create($data);
         return response()->json([
             'message' => 'Данные успешно сохранены!',

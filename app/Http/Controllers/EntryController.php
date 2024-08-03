@@ -27,7 +27,7 @@ class EntryController extends Controller {
                 return number_format($row->amount, 2, '.', ' ').' ₽';
             })
             ->addColumn('actions', function($row) {
-                return '<button data-entry-id="'.$row->id.'" type="button" class="btn btn-primary m-0 text-start changeRow"><i class="fa-solid fa-pen-to-square"></i></button>';
+                return '<button data-entry-id="'.$row->id.'" type="button" class="btn btn-warning m-0 text-start changeRow"><i class="fa-solid fa-pen-to-square"></i></button>';
             })
             ->rawColumns(['actions'])
             ->make(true);
