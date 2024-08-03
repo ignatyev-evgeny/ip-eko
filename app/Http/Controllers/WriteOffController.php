@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\WriteOffRequest;
+use App\Imports\WriteOffsImport;
 use App\Models\WriteOff;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class WriteOffController extends Controller {
@@ -84,6 +86,22 @@ class WriteOffController extends Controller {
         return response()->json([
             'message' => 'Списание успешно обновлено',
             'writeoff' => $writeoff,
+        ], 201);
+    }
+
+    public function upload(Request $request) {
+        $request->validate([
+            'supplierType' => 'required|string',
+            'file' => 'required|file|mimes:xlsx'
+        ]);
+
+        $file = $request->file('file');
+        $supplierType = $request->input('supplierType');
+
+        Excel::import(new WriteOffsImport($supplierType), $file);
+
+        return response()->json([
+            'message' => 'Файл успешно поставлен в очередь на обработку.',
         ], 201);
     }
 

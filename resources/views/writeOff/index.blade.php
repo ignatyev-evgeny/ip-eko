@@ -168,6 +168,35 @@
         </div>
     </div>
 
+    <div id="uploadModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Загрузить файл</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="uploadForm">
+                        <div class="form-group mb-3">
+                            <select id="supplierType" class="form-control" required>
+                                <option value="">Выберите тип</option>
+                                <option value="VCR">ВЦР</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="fileInput">Выберите файл</label>
+                            <input type="file" id="fileInput" class="form-control-file" accept=".xlsx" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" id="uploadButton" class="btn btn-primary">Загрузить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -418,7 +447,14 @@
                                 }
                             }
                         },
-                        'copy', 'excel'
+                        'copy', 'excel',
+                        {
+                            text: 'Загрузить файл',
+                            className: 'btn btn-warning',
+                            action: function ( e, dt, node, config ) {
+                                $('#uploadModal').modal('show');
+                            }
+                        }
                     ]
                 },
                 bottomEnd: {
@@ -550,7 +586,6 @@
             });
         });
 
-
         $("#editContract").autocomplete({
             source: function(request, response) {
                 $.ajax({
@@ -576,6 +611,35 @@
                 $(".ui-autocomplete").css("z-index", 1056);
                 $(".ui-autocomplete").css("position", "absolute");
             }
+        });
+
+        $('#uploadButton').on('click', function() {
+            var supplierType = $('#supplierType').val();
+            var fileInput = $('#fileInput')[0].files[0];
+
+            if (!supplierType || !fileInput) {
+                alert('Пожалуйста, выберите тип поставщика и файл для загрузки.');
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('supplierType', supplierType);
+            formData.append('file', fileInput);
+
+            $.ajax({
+                url: '{{ route('write-off.upload') }}',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    $('#uploadModal').modal('hide');
+                    alert(response.message);
+                },
+                error: function(xhr, status, error) {
+                    alert('Произошла ошибка при загрузке файла: ' + error);
+                }
+            });
         });
 
         $.ui.autocomplete.prototype._renderMenu = function(ul, items) {

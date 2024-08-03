@@ -28,6 +28,7 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
         Route::get('/data', [WriteOffController::class, 'data'])->name('data');
         Route::get('/detail/{writeoff}', [WriteOffController::class, 'detail'])->name('detail');
         Route::post('/store', [WriteOffController::class, 'store'])->name('store');
+        Route::post('/upload', [WriteOffController::class, 'upload'])->name('upload');
         Route::patch('/update/{writeoff}', [WriteOffController::class, 'update'])->name('update');
         Route::delete('/delete', [WriteOffController::class, 'delete'])->name('delete');
     });
