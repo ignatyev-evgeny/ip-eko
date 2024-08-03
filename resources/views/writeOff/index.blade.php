@@ -140,11 +140,12 @@
 
     $(document).ready( function () {
 
-        BX24.init(function(){
-            console.log('Инициализация завершена!', BX24.isAdmin());
-        });
-
-        BX24.fitWindow()
+        @if($iframe)
+            BX24.init(function(){
+                console.log('Инициализация завершена!', BX24.isAdmin());
+            });
+            BX24.fitWindow()
+        @endif
 
         const table = $('#example').DataTable({
             scrollX: true,
@@ -153,8 +154,8 @@
             ajax: '{{ route('write-off.data') }}',
             columns: [
                 { data: 'external' },
-                { data: 'store' },
                 { data: 'date' },
+                { data: 'store' },
                 { data: 'total_weight' },
                 { data: 'total_amount' },
                 { data: 'counteragent' },
