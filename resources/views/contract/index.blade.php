@@ -23,8 +23,8 @@
     <header class="d-flex justify-content-center py-3">
         <ul class="nav nav-pills">
             <li class="nav-item"><a href="{{ route('index') }}" class="nav-link">Главная</a></li>
-            <li class="nav-item"><a href="{{ route('supplier.list') }}" class="nav-link">Поставщики</a></li>
-            <li class="nav-item"><a href="{{ route('client.list') }}" class="nav-link" >Клиенты</a></li>
+{{--            <li class="nav-item"><a href="{{ route('supplier.list') }}" class="nav-link">Поставщики</a></li>--}}
+{{--            <li class="nav-item"><a href="{{ route('client.list') }}" class="nav-link" >Клиенты</a></li>--}}
             <li class="nav-item"><a href="#" class="nav-link active" aria-current="page">Договоры</a></li>
             <li class="nav-item"><a href="{{ route('entry.list') }}" class="nav-link">Поступления</a></li>
             <li class="nav-item"><a href="{{ route('write-off.list') }}" class="nav-link">Списания</a></li>
@@ -83,16 +83,32 @@
 
     $(document).ready( function () {
 
+        @if($iframe)
         BX24.init(function(){
             console.log('Инициализация завершена!', BX24.isAdmin());
         });
+        BX24.fitWindow()
+        @endif
 
 
         const table = $('#contracts').DataTable({
             scrollX: true,
+            stateSave: true,
             pageLength: 100,
             processing: true,
             ajax: '{{ route('contract.data') }}',
+            layout: {
+                topStart: {
+                    buttons: [
+                        'copy', 'excel'
+                    ]
+                },
+                bottomEnd: {
+                    paging: {
+                        firstLast: false
+                    }
+                }
+            },
             columns: [
                 { data: 'title' },
                 { data: 'balance' },
@@ -146,32 +162,6 @@
                 .nodes()
                 .each((el) => el.classList.add('highlight'));
         });
-
-        {{--$('#example').DataTable({--}}
-        {{--    ajax: '/product-item/{{ $integration->id }}?dealId={{ $dealId }}',--}}
-        {{--    columns: [--}}
-        {{--        { data: 'deal', sortable: false, className: 'align-middle', width: "100px" },--}}
-        {{--        { data: 'productName', sortable: false, className: 'dt-left align-middle' },--}}
-        {{--        { data: 'article', sortable: false, className: 'dt-left align-middle' },--}}
-        {{--        { data: 'analogs', sortable: false, className: 'dt-left align-middle' },--}}
-        {{--        { data: 'amount', className: 'align-middle', sortable: false, width: "150px" },--}}
-        {{--        { data: 'quantity', className: 'align-middle', sortable: false, width: "100px" },--}}
-        {{--        { data: 'discount', className: 'align-middle', sortable: false },--}}
-        {{--        { data: 'tax', className: 'align-middle', sortable: false },--}}
-        {{--        { data: 'total', className: 'align-middle', sortable: false, width: "150px" },--}}
-        {{--        { data: 'action', sortable: false, className: 'align-middle', width: "70px" },--}}
-        {{--    ],--}}
-        {{--    processing: false,--}}
-        {{--    serverSide: true,--}}
-        {{--    pageLength: 100,--}}
-        {{--    language: {--}}
-        {{--        url: "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"--}}
-        {{--    },--}}
-        {{--    initComplete: function () {--}}
-        {{--        BX24.fitWindow();--}}
-        {{--    }--}}
-        {{--});--}}
-
 
     });
 

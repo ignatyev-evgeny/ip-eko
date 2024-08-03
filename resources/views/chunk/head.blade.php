@@ -7,5 +7,8 @@
     <link href="{{ asset('assets/dist/css/app.css') }}" rel="stylesheet">
     <script src="{{ asset('assets/dist/js/bootstrap.bundle.min.js') }}"></script>
     @include('chunk.datatable')
-    <script src="//api.bitrix24.com/api/v1/"></script>
+    @if($iframe)
+        <script src="//api.bitrix24.com/api/v1/"></script>
+    @endif
+    <script src="https://kit.fontawesome.com/581b7721a1.js" crossorigin="anonymous"></script>
 </head>

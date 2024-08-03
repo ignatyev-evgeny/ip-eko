@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
+use App\Models\Contract;
+use App\Models\Entry;
 use App\Models\Integration;
+use App\Models\Supplier;
+use App\Models\WriteOff;
 use Config;
 use Exception;
 use Illuminate\Http\Request;
@@ -16,7 +21,14 @@ class IndexController extends Controller {
 
         try {
 
-            return view('index');
+            return view('index', [
+                'iframe' => $request->server()['HTTP_SEC_FETCH_DEST'] == 'iframe',
+                'contracts' => Contract::count(),
+                'writeoffs' => WriteOff::count(),
+                'entries' => Entry::count(),
+                'clients' => Client::count(),
+                'suppliers' => Supplier::count()
+            ]);
 
         } catch (Exception $exception) {
             report($exception);

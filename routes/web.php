@@ -17,13 +17,19 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
     Route::name('entry.')->prefix('entry')->group(function () {
         Route::get('/list', [EntryController::class, 'list'])->name('list');
         Route::get('/data', [EntryController::class, 'data'])->name('data');
+        Route::get('/detail/{entry}', [EntryController::class, 'detail'])->name('detail');
         Route::post('/store', [EntryController::class, 'store'])->name('store');
+        Route::patch('/update/{entry}', [EntryController::class, 'update'])->name('update');
+        Route::delete('/delete', [EntryController::class, 'delete'])->name('delete');
     });
 
     Route::name('write-off.')->prefix('write-off')->group(function () {
         Route::get('/list', [WriteOffController::class, 'list'])->name('list');
         Route::get('/data', [WriteOffController::class, 'data'])->name('data');
+        Route::get('/detail/{writeoff}', [WriteOffController::class, 'detail'])->name('detail');
         Route::post('/store', [WriteOffController::class, 'store'])->name('store');
+        Route::patch('/update/{writeoff}', [WriteOffController::class, 'update'])->name('update');
+        Route::delete('/delete', [WriteOffController::class, 'delete'])->name('delete');
     });
 
     Route::name('supplier.')->prefix('supplier')->group(function () {

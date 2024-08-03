@@ -7,9 +7,10 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
 class ContractController extends Controller {
-    public function list() {
+    public function list(Request $request) {
         return view('contract.index', [
-            'contracts' => Contract::all()
+            'contracts' => Contract::all(),
+            'iframe' => $request->server()['HTTP_SEC_FETCH_DEST'] == 'iframe',
         ]);
     }
 
