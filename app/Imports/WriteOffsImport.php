@@ -3,9 +3,17 @@
 namespace App\Imports;
 
 use App\Models\WriteOff;
+use Carbon\Carbon;
+use Log;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Events\AfterImport;
+use Maatwebsite\Excel\Events\BeforeImport;
 
-class WriteOffsImport implements ToModel
+class WriteOffsImport implements ToModel, WithChunkReading, WithEvents, WithStartRow
 {
     /**
     * @param array $row
@@ -22,26 +30,54 @@ class WriteOffsImport implements ToModel
 
     public function model(array $row)
     {
+        try {
+            $data = [];
 
-        $data = [];
+            if($this->supplierType == 'VCR') {
+                $data = [
+                    'external' => $row[2],
+                    'store' => $row[3],
+                    'date' => Carbon::createFromFormat('d.m.Y', $row[4])->format('Y-m-d H:i:s'),
+                    'total_weight' => 1,
+                    'total_amount' => 1,
+                    'total_detail' => [
+                        'fruits_weight' => $row[5],
+                        'bread_weight' => $row[6],
+                        'milk_weight' => $row[7],
+                        'groceries_weight' => $row[8],
+                        'other_weight' => $row[9],
+                    ],
+                ];
+            }
 
-        if($this->supplierType == 'VCR') {
-            $data = [
-                'external' => $row['№'],
-                'store' => $row['Магазин'],
-                'date' => $row['Дата отгрузки'],
-                'total_weight' => 1,
-                'total_amount' => 1,
-                'total_detail' => [
-                    'fruits_weight' => $row['Овощи/Фрукты'],
-                    'bread_weight' => $row['Хлеб'],
-                    'milk_weight' => $row['Молочная продукция'],
-                    'groceries_weight' => $row['Мясная гастрономия'],
-                    'other_weight' => $row['Прочее'],
-                ],
-            ];
+            return new WriteOff($data);
+
+        } catch (\Exception $exception) {
+            Log::error('Ошибка импорта: ' . $exception->getMessage());
         }
 
-        return new WriteOff($data);
     }
+
+    public function chunkSize(): int
+    {
+        return 100;
+    }
+
+    public function startRow(): int
+    {
+        return 2; // Начинать импорт со второй строки
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            BeforeImport::class => function (BeforeImport $event) {
+                Log::info('Начало импорта файла');
+            },
+            AfterImport::class => function (AfterImport $event) {
+                Log::info('Импорт файла завершен');
+            },
+        ];
+    }
+
 }

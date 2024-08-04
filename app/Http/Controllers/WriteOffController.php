@@ -7,7 +7,7 @@ use App\Imports\WriteOffsImport;
 use App\Models\WriteOff;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Excel;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class WriteOffController extends Controller {
