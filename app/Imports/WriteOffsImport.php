@@ -2,17 +2,17 @@
 
 namespace App\Imports;
 
-use App\Models\WriteOff;
-use Carbon\Carbon;
+use App\Jobs\ProcessWriteOffsImport;
 use Log;
-use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Events\AfterImport;
 use Maatwebsite\Excel\Events\BeforeImport;
+use Illuminate\Support\Collection;
 
-class WriteOffsImport implements ToModel, WithChunkReading, WithEvents, WithStartRow
+class WriteOffsImport implements ToCollection, WithChunkReading, WithEvents, WithStartRow
 {
     /**
     * @param array $row
@@ -27,39 +27,14 @@ class WriteOffsImport implements ToModel, WithChunkReading, WithEvents, WithStar
         $this->supplierType = $supplierType;
     }
 
-    public function model(array $row)
+    public function collection(Collection $rows)
     {
-        try {
-            $data = [];
-
-            if($this->supplierType == 'VCR') {
-                $data = [
-                    'external' => $row[2],
-                    'store' => $row[3],
-                    'date' => Carbon::createFromFormat('d.m.Y', $row[4])->format('Y-m-d H:i:s'),
-                    'total_weight' => $row[5] + $row[6] + $row[7] + $row[8] + $row[9],
-                    'total_amount' => 0,
-                    'total_detail' => [
-                        'fruits_weight' => $row[5],
-                        'bread_weight' => $row[6],
-                        'milk_weight' => $row[7],
-                        'groceries_weight' => $row[8],
-                        'other_weight' => $row[9],
-                    ],
-                ];
-            }
-
-            return new WriteOff($data);
-
-        } catch (\Exception $exception) {
-            Log::error('Ошибка импорта: ' . $exception->getMessage());
-        }
-
+        ProcessWriteOffsImport::dispatch($rows->toArray(), $this->supplierType);
     }
 
     public function chunkSize(): int
     {
-        return 100;
+        return 1000;
     }
 
     public function startRow(): int
@@ -72,6 +47,7 @@ class WriteOffsImport implements ToModel, WithChunkReading, WithEvents, WithStar
         return [
             BeforeImport::class => function (BeforeImport $event) {
                 Log::channel('import')->debug('Начало импорта файла');
+
             },
             AfterImport::class => function (AfterImport $event) {
                 Log::channel('import')->debug('Импорт файла завершен');
