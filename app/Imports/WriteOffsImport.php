@@ -8,7 +8,6 @@ use Log;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Events\AfterImport;
 use Maatwebsite\Excel\Events\BeforeImport;
@@ -38,8 +37,8 @@ class WriteOffsImport implements ToModel, WithChunkReading, WithEvents, WithStar
                     'external' => $row[2],
                     'store' => $row[3],
                     'date' => Carbon::createFromFormat('d.m.Y', $row[4])->format('Y-m-d H:i:s'),
-                    'total_weight' => 1,
-                    'total_amount' => 1,
+                    'total_weight' => $row[5] + $row[6] + $row[7] + $row[8] + $row[9],
+                    'total_amount' => 0,
                     'total_detail' => [
                         'fruits_weight' => $row[5],
                         'bread_weight' => $row[6],
@@ -65,17 +64,17 @@ class WriteOffsImport implements ToModel, WithChunkReading, WithEvents, WithStar
 
     public function startRow(): int
     {
-        return 2; // Начинать импорт со второй строки
+        return 2;
     }
 
     public function registerEvents(): array
     {
         return [
             BeforeImport::class => function (BeforeImport $event) {
-                Log::info('Начало импорта файла');
+                Log::channel('import')->debug('Начало импорта файла');
             },
             AfterImport::class => function (AfterImport $event) {
-                Log::info('Импорт файла завершен');
+                Log::channel('import')->debug('Импорт файла завершен');
             },
         ];
     }
