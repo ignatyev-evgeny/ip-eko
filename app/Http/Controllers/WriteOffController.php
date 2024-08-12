@@ -81,6 +81,29 @@ class WriteOffController extends Controller {
 
     public function update(WriteOff $writeoff, WriteOffRequest $request) {
         $data = $request->validated();
+
+        $data['total_detail'] = [
+            'fruits_amount' => $data['fruits_amount'] ?? 0,
+            'fruits_weight' => $data['fruits_weight'] ?? 0,
+            'bread_amount' => $data['bread_amount'] ?? 0,
+            'bread_weight' => $data['bread_weight'] ?? 0,
+            'milk_amount' => $data['milk_amount'] ?? 0,
+            'milk_weight' => $data['milk_weight'] ?? 0,
+            'food_waste_amount' => $data['food_waste_amount'] ?? 0,
+            'food_waste_weight' => $data['food_waste_weight'] ?? 0,
+            'used_vegetable_oil_amount' => $data['used_vegetable_oil_amount'] ?? 0,
+            'used_vegetable_oil_weight' => $data['used_vegetable_oil_weight'] ?? 0,
+            'groceries_amount' => $data['groceries_amount'] ?? 0,
+            'groceries_weight' => $data['groceries_weight'] ?? 0,
+            'other_amount' => $data['other_amount'] ?? 0,
+            'other_weight' => $data['other_weight'] ?? 0,
+        ];
+
+        if(empty($data['total_weight'])) {
+            $data['total_weight'] = $data['total_detail']['fruits_weight'] + $data['total_detail']['bread_weight'] + $data['total_detail']['milk_weight'] + $data['total_detail']['food_waste_weight'] + $data['total_detail']['used_vegetable_oil_weight'] + $data['total_detail']['groceries_weight'] + $data['total_detail']['other_weight'];
+            $data['total_amount'] = $data['total_detail']['fruits_amount'] + $data['total_detail']['bread_amount'] + $data['total_detail']['milk_amount'] + $data['total_detail']['food_waste_amount'] + $data['total_detail']['used_vegetable_oil_amount'] + $data['total_detail']['groceries_amount'] + $data['total_detail']['other_amount'];
+        }
+
         $writeoff->update($data);
 
         return response()->json([
@@ -92,13 +115,17 @@ class WriteOffController extends Controller {
     public function upload(Request $request) {
         $request->validate([
             'supplierType' => 'required|string',
-            'file' => 'required|file|mimes:xlsx'
+            'file' => 'required|file|mimes:csv'
         ]);
 
         $file = $request->file('file');
         $supplierType = $request->input('supplierType');
 
-        Excel::import(new WriteOffsImport($supplierType), $file);
+        Excel::import(new WriteOffsImport($supplierType), $file, null, \Maatwebsite\Excel\Excel::CSV, [
+            'delimiter' => ',',
+            'enclosure' => '"',
+            'escape_character' => '\\',
+        ]);
 
         return response()->json([
             'message' => 'Файл успешно поставлен в очередь на обработку.',

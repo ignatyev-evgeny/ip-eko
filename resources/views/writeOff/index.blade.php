@@ -92,7 +92,6 @@
                         </div>
                         <div class="col-4">
                             <div class="mb-3">
-
                                 <div class="d-flex justify-content-between align-items-center">
                                     <label for="total_weight" class="form-label">Отгружено</label>
                                     <div class="form-check form-switch">
@@ -181,11 +180,13 @@
                             <select id="supplierType" class="form-control" required>
                                 <option value="">Выберите тип</option>
                                 <option value="VCR">ВЦР</option>
+                                <option value="CROSSROAD">Перекресток</option>
+                                <option value="BIO">БИО</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="fileInput">Выберите файл</label>
-                            <input type="file" id="fileInput" class="form-control-file" accept=".xlsx" required>
+                            <input type="file" id="fileInput" class="form-control-file" accept=".csv" required>
                         </div>
                     </form>
                 </div>
@@ -197,59 +198,218 @@
         </div>
     </div>
 
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade " id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered3 modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editModalLabel">Редактирование</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm">
-                        @csrf
-                        <input type="hidden" id="editId" name="id">
-                        <div class="mb-3">
-                            <label for="contract" class="form-label">Договор</label>
-                            <input type="text" class="form-control contractInput" name="contract" id="editContract" aria-describedby="contractInput">
-                        </div>
-                        <div class="mb-3">
-                            <label for="retailer" class="form-label">Ретейлер</label>
-                            <input type="text" class="form-control" name="retailer" id="editRetailer">
-                        </div>
-                        <div class="mb-3">
-                            <label for="date" class="form-label">Дата</label>
-                            <input type="datetime-local" name="date" class="form-control" id="editDate">
-                        </div>
-                        <div class="mb-3">
-                            <label for="total_weight" class="form-label">Отгружено</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="total_weight" id="editTotal_weight">
-                                <span class="input-group-text">кг.</span>
-                                <span class="input-group-text">0.00</span>
+                    <div class="container-fluid">
+                        <form id="editForm">
+                            @csrf
+                            <input type="hidden" id="editId" name="id">
+
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="mb-3">
+                                        <label for="contract" class="form-label">Договор</label>
+                                        <input type="text" class="form-control contractInput" name="contract" id="editContract" aria-describedby="contractInput">
+                                    </div>
+                                </div>
+                                <div class="col-4 ms-auto">
+                                    <div class="mb-3">
+                                        <label for="retailer" class="form-label">Ретейлер</label>
+                                        <input type="text" class="form-control" name="retailer" id="editRetailer">
+                                    </div>
+                                </div>
+                                <div class="col-4 ms-auto">
+                                    <div class="mb-3">
+                                        <label for="date" class="form-label">Дата</label>
+                                        <input type="datetime-local" name="date" class="form-control" id="editDate">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="total_amount" class="form-label">Сумма</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="total_amount" id="editTotal_amount">
-                                <span class="input-group-text">₽</span>
-                                <span class="input-group-text">0.00</span>
+                            <div class="row">
+                                <div class="col-6 ms-auto">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <label for="total_weight" class="form-label">Отгружено</label>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="detailEditToggle">
+                                                <label class="form-check-label" for="detailEditToggle">Детальный вид</label>
+                                            </div>
+                                        </div>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="total_weight" id="editTotal_weight">
+                                            <span class="input-group-text">кг.</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 ms-auto">
+                                    <div class="mb-3">
+                                        <label for="total_amount" class="form-label">Сумма</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="total_amount" id="editTotal_amount">
+                                            <span class="input-group-text">₽</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="external" class="form-label">Номер магазина</label>
-                            <input type="text" class="form-control" name="external" id="editExternal">
-                        </div>
-                        <div class="mb-3">
-                            <label for="store" class="form-label">Адрес магазина</label>
-                            <input type="text" class="form-control" name="store" id="editStore">
-                        </div>
-                        <div class="mb-3">
-                            <label for="counteragent" class="form-label">Контрагент (Клиент)</label>
-                            <input type="text" class="form-control" name="counteragent" id="editCounteragent">
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">Сохранить</button>
-                    </form>
+                            <div class="row additionalEditFields d-none">
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="fruits_amount" id="fruits_amount_edit" placeholder="Фрукты овощи">
+                                            <span class="input-group-text">₽</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="fruits_weight" id="fruits_weight_edit" placeholder="Фрукты овощи">
+                                            <span class="input-group-text">кг.</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="bread_amount" id="bread_amount_edit" placeholder="Хлебобулочные изделия">
+                                            <span class="input-group-text">₽</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="bread_weight" id="bread_weight_edit" placeholder="Хлебобулочные изделия">
+                                            <span class="input-group-text">кг.</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="milk_amount" id="milk_amount_edit" placeholder="Молочная гастрономия">
+                                            <span class="input-group-text">₽</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="milk_weight" id="milk_weight_edit" placeholder="Молочная гастрономия">
+                                            <span class="input-group-text">кг.</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="food_waste_amount" id="food_waste_amount_edit" placeholder="Пищевые отходы">
+                                            <span class="input-group-text">₽</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="food_waste_weight" id="food_waste_weight_edit" placeholder="Пищевые отходы">
+                                            <span class="input-group-text">кг.</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="used_vegetable_oil_amount" id="used_vegetable_oil_amount_edit" placeholder="Отработанное растительное масло">
+                                            <span class="input-group-text">₽</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="used_vegetable_oil_weight" id="used_vegetable_oil_weight_edit" placeholder="Отработанное растительное масло">
+                                            <span class="input-group-text">кг.</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="groceries_amount" id="groceries_amount_edit" placeholder="Бакалея">
+                                            <span class="input-group-text">₽</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="groceries_weight" id="groceries_weight_edit" placeholder="Бакалея">
+                                            <span class="input-group-text">кг.</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="other_amount" id="other_amount_edit" placeholder="Иное">
+                                            <span class="input-group-text">₽</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="other_weight" id="other_weight_edit" placeholder="Иное">
+                                            <span class="input-group-text">кг.</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 ms-auto">
+                                    <div class="mb-3">
+                                        <label for="external" class="form-label">Номер магазина</label>
+                                        <input type="text" class="form-control" name="external" id="editExternal">
+                                    </div>
+                                </div>
+                                <div class="col-4 ms-auto">
+                                    <div class="mb-3">
+                                        <label for="store" class="form-label">Адрес магазина</label>
+                                        <input type="text" class="form-control" name="store" id="editStore">
+                                    </div>
+                                </div>
+                                <div class="col-4 ms-auto">
+                                    <div class="mb-3">
+                                        <label for="counteragent" class="form-label">Контрагент (Клиент)</label>
+                                        <input type="text" class="form-control" name="counteragent" id="editCounteragent">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -412,6 +572,22 @@
             }
         });
 
+        $('#detailEditToggle').change(function() {
+            if ($(this).is(':checked')) {
+
+                $('#editTotal_weight').attr('disabled', true);
+                $('#editTotal_amount').attr('disabled', true);
+                $('.additionalEditFields').removeClass('d-none');
+
+            } else {
+                $('#editTotal_weight').attr('disabled', false);
+                $('#editTotal_amount').attr('disabled', false);
+                $('.additionalEditFields').addClass('d-none');
+            }
+        });
+
+
+
         const table = $('#example').DataTable({
             scrollX: true,
             stateSave: true,
@@ -488,6 +664,23 @@
                     $('#editExternal').val(response.writeOff.external);
                     $('#editStore').val(response.writeOff.store);
                     $('#editCounteragent').val(response.writeOff.counteragent);
+
+                    $('#fruits_amount_edit').val(response.writeOff.total_detail.fruits_amount);
+                    $('#fruits_weight_edit').val(response.writeOff.total_detail.fruits_weight);
+                    $('#bread_amount_edit').val(response.writeOff.total_detail.bread_amount);
+                    $('#bread_weight_edit').val(response.writeOff.total_detail.bread_weight);
+                    $('#milk_amount_edit').val(response.writeOff.total_detail.milk_amount);
+                    $('#milk_weight_edit').val(response.writeOff.total_detail.milk_weight);
+                    $('#food_waste_amount_edit').val(response.writeOff.total_detail.food_waste_amount);
+                    $('#food_waste_weight_edit').val(response.writeOff.total_detail.food_waste_weight);
+                    $('#used_vegetable_oil_amount_edit').val(response.writeOff.total_detail.used_vegetable_oil_amount);
+                    $('#used_vegetable_oil_weight_edit').val(response.writeOff.total_detail.used_vegetable_oil_weight);
+                    $('#groceries_amount_edit').val(response.writeOff.total_detail.groceries_amount);
+                    $('#groceries_weight_edit').val(response.writeOff.total_detail.groceries_weight);
+                    $('#other_amount_edit').val(response.writeOff.total_detail.other_amount);
+                    $('#other_weight_edit').val(response.writeOff.total_detail.other_weight);
+
+
                     $('#editModal').modal('show');
                 },
                 error: function(xhr) {

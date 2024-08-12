@@ -44,7 +44,7 @@ class ProcessWriteOffsImport implements ShouldQueue
                     $data = [
                         'external' => $row[2],
                         'store' => $row[3],
-                        'date' => Carbon::createFromFormat('d.m.Y', $row[4])->format('Y-m-d H:i:s'),
+                        'date' => Carbon::createFromFormat('d.m.Y', $row[4])->format('Y-m-d H:i'),
                         'total_weight' => $row[5] + $row[6] + $row[7] + $row[8] + $row[9],
                         'total_amount' => 0,
                         'total_detail' => [
@@ -54,6 +54,57 @@ class ProcessWriteOffsImport implements ShouldQueue
                             'groceries_weight' => $row[8],
                             'other_weight' => $row[9],
                         ],
+                    ];
+                }
+
+                if ($this->supplierType == 'CROSSROAD') {
+
+                    Log::debug(json_encode($row));
+
+                    $detail['fruits_weight'] = match ($row[8]) {
+                        50000066 => $row[10],
+                        default => null
+                    };
+
+                    $detail['bread_weight'] = match ($row[8]) {
+                        50000069 => $row[10],
+                        default => null
+                    };
+
+                    $detail['milk_weight'] = match ($row[8]) {
+                        50000063 => $row[10],
+                        default => null
+                    };
+
+                    $detail['other_weight'] = match ($row[8]) {
+                        50000070 => $row[10],
+                        default => null
+                    };
+
+                    $data = [
+                        'external' => $row[1],
+                        'store' => $row[4].' | '.$row[5],
+                        'date' => Carbon::createFromFormat('d/m/Y', $row[0])->format('Y-m-d H:i'),
+                        'total_weight' => $row[10],
+                        'total_amount' => 0,
+                        'total_detail' => [
+                            'fruits_weight' => $detail['fruits_weight'],
+                            'bread_weight' => $detail['bread_weight'],
+                            'milk_weight' => $detail['bread_weight'],
+                            'groceries_weight' => $detail['milk_weight'],
+                            'other_weight' => $detail['other_weight'],
+                        ],
+                    ];
+                }
+
+                if ($this->supplierType == 'BIO') {
+
+                    Log::debug(json_encode($row));
+
+                    $data = [
+                        'store' => $row[3],
+                        'date' => Carbon::createFromFormat('d/m/Y', $row[2])->format('Y-m-d H:i'),
+                        'total_weight' => $row[4],
                     ];
                 }
 
