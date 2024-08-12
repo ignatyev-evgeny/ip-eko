@@ -665,49 +665,50 @@
                     $('#editStore').val(response.writeOff.store);
                     $('#editCounteragent').val(response.writeOff.counteragent);
 
-                    if (response.writeOff.total_detail.fruits_amount !== undefined) {
-                        $('#fruits_amount_edit').val(response.writeOff.total_detail.fruits_amount);
+                    if (response.writeOff.total_detail) {
+                        if (response.writeOff.total_detail.fruits_amount !== undefined) {
+                            $('#fruits_amount_edit').val(response.writeOff.total_detail.fruits_amount);
+                        }
+                        if (response.writeOff.total_detail.fruits_weight !== undefined) {
+                            $('#fruits_weight_edit').val(response.writeOff.total_detail.fruits_weight);
+                        }
+                        if (response.writeOff.total_detail.bread_amount !== undefined) {
+                            $('#bread_amount_edit').val(response.writeOff.total_detail.bread_amount);
+                        }
+                        if (response.writeOff.total_detail.bread_weight !== undefined) {
+                            $('#bread_weight_edit').val(response.writeOff.total_detail.bread_weight);
+                        }
+                        if (response.writeOff.total_detail.milk_amount !== undefined) {
+                            $('#milk_amount_edit').val(response.writeOff.total_detail.milk_amount);
+                        }
+                        if (response.writeOff.total_detail.milk_weight !== undefined) {
+                            $('#milk_weight_edit').val(response.writeOff.total_detail.milk_weight);
+                        }
+                        if (response.writeOff.total_detail.food_waste_amount !== undefined) {
+                            $('#food_waste_amount_edit').val(response.writeOff.total_detail.food_waste_amount);
+                        }
+                        if (response.writeOff.total_detail.food_waste_weight !== undefined) {
+                            $('#food_waste_weight_edit').val(response.writeOff.total_detail.food_waste_weight);
+                        }
+                        if (response.writeOff.total_detail.used_vegetable_oil_amount !== undefined) {
+                            $('#used_vegetable_oil_amount_edit').val(response.writeOff.total_detail.used_vegetable_oil_amount);
+                        }
+                        if (response.writeOff.total_detail.used_vegetable_oil_weight !== undefined) {
+                            $('#used_vegetable_oil_weight_edit').val(response.writeOff.total_detail.used_vegetable_oil_weight);
+                        }
+                        if (response.writeOff.total_detail.groceries_amount !== undefined) {
+                            $('#groceries_amount_edit').val(response.writeOff.total_detail.groceries_amount);
+                        }
+                        if (response.writeOff.total_detail.groceries_weight !== undefined) {
+                            $('#groceries_weight_edit').val(response.writeOff.total_detail.groceries_weight);
+                        }
+                        if (response.writeOff.total_detail.other_amount !== undefined) {
+                            $('#other_amount_edit').val(response.writeOff.total_detail.other_amount);
+                        }
+                        if (response.writeOff.total_detail.other_weight !== undefined) {
+                            $('#other_weight_edit').val(response.writeOff.total_detail.other_weight);
+                        }
                     }
-                    if (response.writeOff.total_detail.fruits_weight !== undefined) {
-                        $('#fruits_weight_edit').val(response.writeOff.total_detail.fruits_weight);
-                    }
-                    if (response.writeOff.total_detail.bread_amount !== undefined) {
-                        $('#bread_amount_edit').val(response.writeOff.total_detail.bread_amount);
-                    }
-                    if (response.writeOff.total_detail.bread_weight !== undefined) {
-                        $('#bread_weight_edit').val(response.writeOff.total_detail.bread_weight);
-                    }
-                    if (response.writeOff.total_detail.milk_amount !== undefined) {
-                        $('#milk_amount_edit').val(response.writeOff.total_detail.milk_amount);
-                    }
-                    if (response.writeOff.total_detail.milk_weight !== undefined) {
-                        $('#milk_weight_edit').val(response.writeOff.total_detail.milk_weight);
-                    }
-                    if (response.writeOff.total_detail.food_waste_amount !== undefined) {
-                        $('#food_waste_amount_edit').val(response.writeOff.total_detail.food_waste_amount);
-                    }
-                    if (response.writeOff.total_detail.food_waste_weight !== undefined) {
-                        $('#food_waste_weight_edit').val(response.writeOff.total_detail.food_waste_weight);
-                    }
-                    if (response.writeOff.total_detail.used_vegetable_oil_amount !== undefined) {
-                        $('#used_vegetable_oil_amount_edit').val(response.writeOff.total_detail.used_vegetable_oil_amount);
-                    }
-                    if (response.writeOff.total_detail.used_vegetable_oil_weight !== undefined) {
-                        $('#used_vegetable_oil_weight_edit').val(response.writeOff.total_detail.used_vegetable_oil_weight);
-                    }
-                    if (response.writeOff.total_detail.groceries_amount !== undefined) {
-                        $('#groceries_amount_edit').val(response.writeOff.total_detail.groceries_amount);
-                    }
-                    if (response.writeOff.total_detail.groceries_weight !== undefined) {
-                        $('#groceries_weight_edit').val(response.writeOff.total_detail.groceries_weight);
-                    }
-                    if (response.writeOff.total_detail.other_amount !== undefined) {
-                        $('#other_amount_edit').val(response.writeOff.total_detail.other_amount);
-                    }
-                    if (response.writeOff.total_detail.other_weight !== undefined) {
-                        $('#other_weight_edit').val(response.writeOff.total_detail.other_weight);
-                    }
-
 
                     $('#editModal').modal('show');
                 },
