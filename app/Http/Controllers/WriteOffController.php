@@ -20,9 +20,20 @@ class WriteOffController extends Controller {
 
     public function data()
     {
-        $writeOffs = WriteOff::select(['id', 'external', 'store', 'date', 'total_weight', 'total_amount', 'counteragent', 'contract', 'retailer']);
+        $writeOffs = WriteOff::select(['id', 'status', 'external', 'store', 'date', 'total_weight', 'total_amount', 'counteragent', 'contract', 'retailer']);
 
         return DataTables::of($writeOffs)
+            ->addColumn('status', function($row) {
+
+                $status = match ($row->status) {
+                    'new' => 'Новое',
+                    'duplicate' => 'Дубликат',
+                    'passed' => 'Проведено',
+                    default => $row->status
+                };
+
+                return $status;
+            })
             ->addColumn('date', function($row) {
                 return Carbon::parse($row->datetime)->format('d/m/Y');
             })

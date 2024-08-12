@@ -7,7 +7,6 @@ use Illuminate\Foundation\Http\FormRequest;
 class EntryStoreRequest extends FormRequest {
     public function rules(): array {
         return [
-            'status' => 'required|string|max:255',
             'datetime' => 'required|date',
             'number' => 'nullable|string|max:255',
             'amount' => 'required|numeric',

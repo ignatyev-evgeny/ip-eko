@@ -132,6 +132,7 @@
             <thead>
             <tr>
                 <th></th>
+                <th>Статус</th>
                 <th>Внешний №</th>
                 <th>Дата</th>
                 <th>Магазин</th>
@@ -596,6 +597,7 @@
             ajax: '{{ route('write-off.data') }}',
             columns: [
                 { data: 'actions' },
+                { data: 'status' },
                 { data: 'external' },
                 { data: 'date' },
                 { data: 'store' },

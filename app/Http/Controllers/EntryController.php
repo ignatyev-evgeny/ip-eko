@@ -20,6 +20,17 @@ class EntryController extends Controller {
     {
         $entries = Entry::select(['id', 'status', 'datetime', 'number', 'amount', 'counteragent', 'counteragent_bank_account', 'contract', 'payment_purpose', 'operation_type']);
         return DataTables::of($entries)
+            ->addColumn('status', function($row) {
+
+                $status = match ($row->status) {
+                    'new' => 'Новое',
+                    'duplicate' => 'Дубликат',
+                    'passed' => 'Проведено',
+                    default => $row->status
+                };
+
+                return $status;
+            })
             ->addColumn('datetime', function($row) {
                 return Carbon::parse($row->datetime)->format('d/m/Y');
             })
@@ -43,6 +54,7 @@ class EntryController extends Controller {
 
     public function store(EntryStoreRequest $request) {
         $data = $request->validated();
+        $data['status'] = 'new';
         $entry = Entry::create($data);
 
         return response()->json([

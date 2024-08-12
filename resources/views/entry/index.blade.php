@@ -68,13 +68,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-4">
-                            <div class="mb-3">
-                                <label for="status" class="form-label">Статус</label>
-                                <input type="text" class="form-control" name="status" id="status">
-                            </div>
-                        </div>
-                        <div class="col-4">
+                        <div class="col-2">
                             <div class="mb-3">
                                 <label for="amount" class="form-label">Поступило</label>
                                 <div class="input-group">
@@ -84,15 +78,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-2">
                             <div class="mb-3">
                                 <label for="datetime" class="form-label">Дата платежа</label>
                                 <input type="datetime-local" name="datetime" class="form-control" id="datetime">
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-4">
+                        <div class="col-2">
                             <div class="mb-3">
                                 <label for="number" class="form-label">Номер</label>
                                 <input type="text" class="form-control" name="number" id="number">
@@ -104,7 +96,7 @@
                                 <input type="text" class="form-control" name="payment_purpose" id="payment_purpose">
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-2">
                             <div class="mb-3">
                                 <label for="operation_type" class="form-label">Вид операции</label>
                                 <input type="text" class="form-control" name="operation_type" id="operation_type">
@@ -181,10 +173,6 @@
                             <div class="mb-3">
                                 <label for="editCounteragent_bank_account" class="form-label">Контрагент (Клиента) р/с</label>
                                 <input type="text" class="form-control" name="counteragent_bank_account" id="editCounteragent_bank_account">
-                            </div>
-                            <div class="mb-3">
-                                <label for="editStatus" class="form-label">Статус</label>
-                                <input type="text" class="form-control" name="status" id="editStatus">
                             </div>
                             <div class="mb-3">
                                 <label for="editAmount" class="form-label">Поступило</label>
