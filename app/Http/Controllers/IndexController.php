@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Contract;
 use App\Models\Entry;
+use App\Models\SberIntegration;
 use App\Models\Supplier;
 use App\Models\WriteOff;
 use Exception;
@@ -15,25 +16,39 @@ class IndexController extends Controller {
 
     public function index(Request $request) {
 
-
-
-
         try {
 
-
             if(isset($request->code)) {
+
+                $issetIntegration = SberIntegration::find(1);
+
+                $client_id = !empty($issetIntegration->client_id) ? $issetIntegration->client_id : '9672';
+                $client_secret = !empty($issetIntegration->client_secret) ? $issetIntegration->client_secret : 'nJ8X8w9W';
+
                 $response = Http::withOptions([
-                    'cert' => '/var/www/ip-eko.bitrix.expert/html/storage/crt/cert.pem', 'testtest',
-                    'ssl_key' => '/var/www/ip-eko.bitrix.expert/html/storage/crt/key.pem', 'testtest',
+                    'cert' => '/var/www/ip-eko.bitrix.expert/html/storage/crt/SBBAPI_9672_7953ec3e-1851-4411-b953-5fd5d168cdc5.pem', '0328Dima',
                     'verify' => false,
-                ])->post('https://iftfintech.testsbi.sberbank.ru:9443/ic/sso/api/v2/oauth/token', [
+                ])->asForm()->post('https://fintech.sberbank.ru:9443/ic/sso/api/v2/oauth/token', [
                     'grant_type' => 'authorization_code',
                     'code' => $request->code,
-                    'client_id' => '13286',
-                    'redirect_uri' => 'https://ip-eko.bitrix.expert/',
-                    'client_secret' => 'SAND66430PILE',
+                    'client_id' => $client_id,
+                    'redirect_uri' => 'https://ip-eko.bitrix.expert',
+                    'client_secret' => $client_secret,
                 ]);
-                dd($response->body());
+
+                $data = $response->object();
+
+                SberIntegration::updateOrCreate([
+                    'id' => 1
+                ], [
+                    'client_id' => $client_id,
+                    'client_secret' => $client_secret,
+                    'scope' => $data->scope,
+                    'access_token' => $data->access_token,
+                    'refresh_token' => $data->refresh_token,
+                    'response' => $data,
+                ]);
+
             }
 
             return view('index', [
@@ -46,7 +61,6 @@ class IndexController extends Controller {
             ]);
 
         } catch (Exception $exception) {
-            dd($exception);
             report($exception);
             abort(500, $exception->getMessage());
         }
