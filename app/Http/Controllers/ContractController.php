@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contract;
+use App\Models\ContractsBalanceHistory;
+use DB;
+use Exception;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -30,6 +33,10 @@ class ContractController extends Controller {
             ->addColumn('local_balance', function($row) {
                 $amount = $row->local_balance ? number_format($row->local_balance, 2, '.', ' ') : 0.00;
                 return $amount.' ₽';
+            })
+
+            ->addColumn('balance_history', function($row) {
+                return '<a href="' . route('contract.history', ['contract' => $row->id]) . '"><button type="button" class="btn btn-sm btn-warning">История</button></a>';
             })
 
             ->addColumn('price', function($row) {
@@ -64,7 +71,11 @@ class ContractController extends Controller {
                 return $row->other.' ₽';
             })
 
-            ->rawColumns(['title', 'export_week_days'])
+            ->rawColumns([
+                'title',
+                'balance_history',
+                'export_week_days'
+            ])
             ->make(true);
     }
 
@@ -82,22 +93,60 @@ class ContractController extends Controller {
 
     public function changeBalance(Request $request) {
 
-        $rowId = $request->input('row');  // Получаем ID строки
-        $columnId = $request->input('column');  // Получаем индекс колонки
-        $value = $request->input('value');  // Получаем новое числовое значение
+        DB::beginTransaction();
 
-        $row = Contract::find($rowId);
+        try {
 
-        switch ($columnId) {
-            case 2: // Колонка "Local Balance"
-                $row->local_balance = $value;
-                break;
+            $rowId = $request->input('row');
+            $columnId = $request->input('column');
+            $value = $request->input('value');
+
+            $row = Contract::find($rowId);
+
+            $balanceSnapshot = $row->local_balance;
+
+            switch ($columnId) {
+                case 2:
+                    $row->local_balance = $value;
+                    break;
+            }
+
+            $row->save();
+
+            if($balanceSnapshot != $value) {
+                ContractsBalanceHistory::create([
+                    'contract_id' => $rowId,
+                    'start_balance' => $balanceSnapshot,
+                    'amount' => 0,
+                    'end_balance' => $value,
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Баланс успешно обновлен'
+            ]);
+
+        } catch (Exception $exception) {
+            DB::rollBack();
+            report($exception);
+            dd($exception);
         }
-
-        $row->save();
-
-        return response()->json(['message' => 'Баланс успешно обновлен']);
 
     }
 
+    public function history(Contract $contract, Request $request) {
+        try {
+            $contract->load('transactions');
+            return view('contract.history', [
+                'iframe' => $request->server()['HTTP_SEC_FETCH_DEST'] == 'iframe',
+                'contract' => $contract,
+                'transactions' => $contract->transactions
+            ]);
+        } catch (Exception $exception) {
+            report($exception);
+            dd($exception);
+        }
+    }
 }

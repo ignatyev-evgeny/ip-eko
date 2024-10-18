@@ -53,6 +53,7 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
         Route::get('/data', [ContractController::class, 'data'])->name('data');
         Route::get('/getNames', [ContractController::class, 'getNames'])->name('getNames');
         Route::post('/changeBalance', [ContractController::class, 'changeBalance'])->name('changeBalance');
+        Route::get('/history/{contract}', [ContractController::class, 'history'])->name('history');
     });
 
 

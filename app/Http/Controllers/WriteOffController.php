@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\WriteOffRequest;
 use App\Imports\WriteOffsImport;
 use App\Models\Contract;
+use App\Models\ContractsBalanceHistory;
 use App\Models\WriteOff;
 use Carbon\Carbon;
+use DB;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -341,34 +343,58 @@ class WriteOffController extends Controller {
             ], 400);
         }
 
-        foreach ($request['writeoffs'] as $entry) {
+        DB::beginTransaction();
 
-            $entry = WriteOff::where('id', $entry)->first();
+        try {
 
-            if($entry->status == 'passed') {
-                continue;
+            foreach ($request['writeoffs'] as $entry) {
+
+                $entry = WriteOff::where('id', $entry)->first();
+
+                if($entry->status == 'passed') {
+                    continue;
+                }
+
+                if(empty($entry->contract)) {
+                    continue;
+                }
+
+                $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+
+                if(empty($contract)) {
+                    continue;
+                }
+
+                $balanceSnapshot = $contract->local_balance;
+                $contract->local_balance = $contract->local_balance - $entry->total_amount;
+                $contract->save();
+
+                $entry->status = 'passed';
+                $entry->save();
+
+                ContractsBalanceHistory::create([
+                    'contract_id' => $contract->id,
+                    'start_balance' => $balanceSnapshot,
+                    'amount' => -$entry->total_amount,
+                    'end_balance' => $balanceSnapshot - $entry->total_amount,
+                ]);
             }
 
-            if(empty($entry->contract)) {
-                continue;
-            }
+            DB::commit();
 
-            $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+            return response()->json([
+                'message' => 'Данные успешно проведены!',
+            ]);
 
-            if(empty($contract)) {
-                continue;
-            }
+        } catch (Exception $exception) {
+            DB::rollBack();
+            report($exception);
+            return response()->json([
+                'message' => 'При проведении некоторых списаний, произошла ошибка!',
+            ], 500);
 
-            $contract->local_balance = $contract->local_balance - $entry->total_amount;
-            $contract->save();
-
-            $entry->status = 'passed';
-            $entry->save();
         }
 
-        return response()->json([
-            'message' => 'Данные успешно проведены!',
-        ]);
     }
 
     public function free(Request $request) {
@@ -379,30 +405,59 @@ class WriteOffController extends Controller {
             ], 400);
         }
 
-        foreach ($request['writeoffs'] as $entry) {
+        DB::beginTransaction();
 
-            $entry = WriteOff::where('id', $entry)->first();
+        try {
 
-            if(empty($entry->contract)) {
-                continue;
+            foreach ($request['writeoffs'] as $entry) {
+
+                $entry = WriteOff::where('id', $entry)->first();
+
+                if($entry->status == 'passed') {
+
+                    if(empty($entry->contract)) {
+                        continue;
+                    }
+
+                    $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+
+                    if(empty($contract)) {
+                        continue;
+                    }
+
+                    $balanceSnapshot = $contract->local_balance;
+                    $contract->local_balance = $contract->local_balance + $entry->total_amount;
+                    $contract->save();
+
+                    ContractsBalanceHistory::create([
+                        'contract_id' => $contract->id,
+                        'start_balance' => $balanceSnapshot,
+                        'amount' => $entry->total_amount,
+                        'end_balance' => $balanceSnapshot + $entry->total_amount,
+                    ]);
+
+                }
+
+                $entry->status = 'free';
+                $entry->save();
+
             }
 
-            $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+            DB::commit();
 
-            if(empty($contract)) {
-                continue;
-            }
+            return response()->json([
+                'message' => 'Статус успешно изменен на - Бесплатный',
+            ]);
 
-            $contract->local_balance = $contract->local_balance + $entry->total_amount;
-            $contract->save();
-
-            $entry->status = 'free';
-            $entry->save();
+        } catch (Exception $exception) {
+            DB::rollBack();
+            report($exception);
+            return response()->json([
+                'message' => 'При проведении некоторых списаний, произошла ошибка!',
+            ], 500);
         }
 
-        return response()->json([
-            'message' => 'Статус успешно изменен на - Бесплатный',
-        ]);
+
     }
 
     public function canceled(Request $request) {
@@ -413,30 +468,57 @@ class WriteOffController extends Controller {
             ], 400);
         }
 
-        foreach ($request['writeoffs'] as $entry) {
+        DB::beginTransaction();
 
-            $entry = WriteOff::where('id', $entry)->first();
+        try {
 
-            if(empty($entry->contract)) {
-                continue;
+            foreach ($request['writeoffs'] as $entry) {
+
+                $entry = WriteOff::where('id', $entry)->first();
+
+                if($entry->status == 'passed') {
+
+                    if(empty($entry->contract)) {
+                        continue;
+                    }
+
+                    $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+
+                    if(empty($contract)) {
+                        continue;
+                    }
+
+                    $contract->local_balance = $contract->local_balance + $entry->total_amount;
+                    $contract->save();
+
+                    $balanceSnapshot = $contract->local_balance;
+                    ContractsBalanceHistory::create([
+                        'contract_id' => $contract->id,
+                        'start_balance' => $balanceSnapshot,
+                        'amount' => $entry->total_amount,
+                        'end_balance' => $balanceSnapshot + $entry->total_amount,
+                    ]);
+
+                }
+
+                $entry->status = 'canceled';
+                $entry->save();
+
             }
 
-            $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+            DB::commit();
 
-            if(empty($contract)) {
-                continue;
-            }
+            return response()->json([
+                'message' => 'Статус успешно изменен на - Аннулирован',
+            ]);
 
-            $contract->local_balance = $contract->local_balance + $entry->total_amount;
-            $contract->save();
-
-            $entry->status = 'canceled';
-            $entry->save();
+        } catch (Exception $exception) {
+            DB::rollBack();
+            report($exception);
+            return response()->json([
+                'message' => 'При проведении некоторых списаний, произошла ошибка!',
+            ], 500);
         }
-
-        return response()->json([
-            'message' => 'Статус успешно изменен на - Аннулирован',
-        ]);
     }
 
     public function upload(Request $request) {

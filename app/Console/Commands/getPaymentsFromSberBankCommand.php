@@ -8,7 +8,6 @@ use App\Models\EntryIgnore;
 use App\Models\SberIntegration;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Str;
 
 class getPaymentsFromSberBankCommand extends Command {
     protected $signature = 'integration:get-payments-from-sber-bank {date?}';

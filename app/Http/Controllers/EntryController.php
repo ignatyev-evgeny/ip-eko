@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EntryStoreRequest;
 use App\Models\Contract;
+use App\Models\ContractsBalanceHistory;
 use App\Models\Entry;
 use App\Models\EntryIgnore;
 use Carbon\Carbon;
 use DB;
+use Exception;
 use Illuminate\Http\Request;
 use Str;
 use Throwable;
@@ -121,33 +123,58 @@ class EntryController extends Controller {
             ], 400);
         }
 
-        foreach ($request['entries'] as $entry) {
-            $entry = Entry::where('id', $entry)->first();
+        DB::beginTransaction();
 
-            if($entry->status == 'passed') {
-                continue;
+        try {
+
+            foreach ($request['entries'] as $entry) {
+                $entry = Entry::where('id', $entry)->first();
+
+                if($entry->status == 'passed') {
+                    continue;
+                }
+
+                if(empty($entry->contract)) {
+                    continue;
+                }
+
+                $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+
+                if(empty($contract)) {
+                    continue;
+                }
+
+                $balanceSnapshot = $contract->local_balance;
+                $contract->local_balance = $contract->local_balance + floatval($entry->amount);
+                $contract->save();
+
+                $entry->status = 'passed';
+                $entry->save();
+
+                ContractsBalanceHistory::create([
+                    'contract_id' => $contract->id,
+                    'start_balance' => $balanceSnapshot,
+                    'amount' => floatval($entry->amount),
+                    'end_balance' => $balanceSnapshot + floatval($entry->amount),
+                ]);
+
             }
 
-            if(empty($entry->contract)) {
-                continue;
-            }
+            DB::commit();
 
-            $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+            return response()->json([
+                'message' => 'Данные успешно проведены!',
+            ]);
 
-            if(empty($contract)) {
-                continue;
-            }
-
-            $contract->local_balance = $contract->local_balance + floatval($entry->amount);
-            $contract->save();
-
-            $entry->status = 'passed';
-            $entry->save();
+        } catch (Exception $exception) {
+            DB::rollBack();
+            report($exception);
+            return response()->json([
+                'message' => 'При проведении некоторых поступлений, произошла ошибка!',
+            ], 500);
         }
 
-        return response()->json([
-            'message' => 'Данные успешно проведены!',
-        ]);
+
     }
 
     public function ignore(Request $request, $type = 'false')

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Contract extends Model {
     protected $fillable = [
@@ -88,4 +89,10 @@ class Contract extends Model {
     protected $casts = [
         'export_week_days' => 'array'
     ];
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(ContractsBalanceHistory::class, 'contract_id', 'id');
+    }
+
 }

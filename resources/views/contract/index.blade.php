@@ -43,6 +43,7 @@
                 <th>ID</th>
                 <th>Статус договора</th>
                 <th>Локальный баланс</th>
+                <th></th>
                 <th>Название</th>
                 <th >Баланс</th>
                 <th>Рекомендуемый платеж</th>
@@ -102,22 +103,49 @@
             pageLength: 100,
             processing: true,
             ajax: '{{ route('contract.data') }}',
-            layout: {
-                topStart: {
-                    buttons: [
-                        'copy', 'excel'
-                    ]
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    text: 'Все',
+
+                    action: function () {
+                        table.columns(1).search('').draw();
+                    }
                 },
-                bottomEnd: {
-                    paging: {
-                        firstLast: false
+                {
+                    text: 'Активные',
+                    className: 'btn btn-success',
+                    action: function () {
+                        table.columns(1).search('Активный').draw();
+                    }
+                },
+                {
+                    text: 'Закрытые',
+                    className: 'btn btn-danger',
+                    action: function () {
+                        table.columns(1).search('Закрыт').draw();
+                    }
+                },
+                {
+                    text: 'Приостановленные',
+                    className: 'btn btn-warning',
+                    action: function () {
+                        table.columns(1).search('Приостановлен').draw();
+                    }
+                },
+                {
+                    text: 'Согласование',
+                    className: 'btn btn-secondary',
+                    action: function () {
+                        table.columns(1).search('Согласование').draw();
                     }
                 }
-            },
+            ],
             columns: [
                 { data: 'id', className: 'text-center align-middle'},
                 { data: 'status', className: 'text-center align-middle'},
                 { data: 'local_balance', className: 'text-center align-middle'},
+                { data: 'balance_history', className: 'text-center align-middle', sortable: false},
                 { data: 'title', className: 'text-center align-middle'},
                 { data: 'balance', visible: false },
                 { data: 'recommended_payment', visible: false },
@@ -227,7 +255,6 @@
             });
 
         });
-
 
         var urlParams = new URLSearchParams(window.location.search);
         var searchTerm = urlParams.get('search');
