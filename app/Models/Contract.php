@@ -43,4 +43,49 @@ class Contract extends Model {
         'balance_status',
         'source',
     ];
+
+    public function getPriceAttribute($value)
+    {
+        preg_match('/\d+(\.\d{1,2})?/', $value, $matches);
+        return (float) $value;
+    }
+
+    public function getPriceFruitsVegetablesAttribute($value)
+    {
+        return (float) $value;
+    }
+
+    public function getPriceBakeryAttribute($value)
+    {
+        return (float) $value;
+    }
+
+    public function getPriceDairyAttribute($value)
+    {
+        return (float) $value;
+    }
+
+    public function getPriceUsedOilAttribute($value)
+    {
+        return (float) $value;
+    }
+
+    public function getPriceGroceryAttribute($value)
+    {
+        return (float) $value;
+    }
+
+    public function getPriceWasteAttribute($value)
+    {
+        return (float) $value;
+    }
+
+    public function getOtherAttribute($value)
+    {
+        return (float) $value;
+    }
+
+    protected $casts = [
+        'export_week_days' => 'array'
+    ];
 }

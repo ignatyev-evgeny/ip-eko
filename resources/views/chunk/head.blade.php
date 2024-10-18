@@ -11,4 +11,7 @@
         <script src="//api.bitrix24.com/api/v1/"></script>
     @endif
     <script src="https://kit.fontawesome.com/581b7721a1.js" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 </head>

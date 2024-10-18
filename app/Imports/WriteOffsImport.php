@@ -7,12 +7,13 @@ use Log;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Events\AfterImport;
 use Maatwebsite\Excel\Events\BeforeImport;
 use Illuminate\Support\Collection;
 
-class WriteOffsImport implements ToCollection, WithChunkReading, WithEvents, WithStartRow
+class WriteOffsImport implements ToCollection, WithChunkReading, WithEvents, WithStartRow, WithHeadingRow
 {
     /**
     * @param array $row
@@ -50,7 +51,7 @@ class WriteOffsImport implements ToCollection, WithChunkReading, WithEvents, Wit
 
             },
             AfterImport::class => function (AfterImport $event) {
-                Log::channel('import')->debug('Импорт файла завершен');
+                Log::channel('import')->debug('Импорт файла завершен'.PHP_EOL);
             },
         ];
     }

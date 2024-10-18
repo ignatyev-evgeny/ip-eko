@@ -18,6 +18,10 @@
         white-space: nowrap;
     }
 
+    .w-500px {
+        width: 500px !important;
+    }
+
 </style>
 <div class="container">
     <header class="d-flex justify-content-center py-3">
@@ -36,8 +40,11 @@
         <table id="contracts" class="table table-striped" style="width:100%">
             <thead>
             <tr>
+                <th>ID</th>
+                <th>Статус договора</th>
+                <th>Локальный баланс</th>
                 <th>Название</th>
-                <th>Баланс</th>
+                <th >Баланс</th>
                 <th>Рекомендуемый платеж</th>
                 <th>Сумма отгрузки за предыдущий период</th>
                 <th>Тип договора</th>
@@ -61,10 +68,8 @@
                 <th>Пищевой отход</th>
                 <th>Иное</th>
                 <th>Город</th>
-                <th>Статус договора</th>
                 <th>№ отгрузки</th>
-                <th>ID Процесса
-                </th>
+                <th>ID Процесса</th>
                 <th>Учтен в поставщике?</th>
                 <th>Ритейлер</th>
                 <th>Регион</th>
@@ -110,44 +115,125 @@
                 }
             },
             columns: [
-                { data: 'title' },
-                { data: 'balance' },
-                { data: 'recommended_payment' },
-                { data: 'previous_period_amount' },
-                { data: 'type' },
-                { data: 'number' },
-                { data: 'date' },
-                { data: 'phone' },
-                { data: 'create_deals' },
-                { data: 'export_start_date' },
-                { data: 'export_week_days' },
-                { data: 'export_frequency' },
-                { data: 'payment_total' },
-                { data: 'payment_type' },
-                { data: 'export_total_count' },
-                { data: 'attorney_date' },
-                { data: 'price' },
-                { data: 'price_fruits_vegetables' },
-                { data: 'price_bakery' },
-                { data: 'price_dairy' },
-                { data: 'price_used_oil' },
-                { data: 'price_grocery' },
-                { data: 'price_waste' },
-                { data: 'other' },
-                { data: 'city' },
-                { data: 'status' },
-                { data: 'shipment' },
-                { data: 'process' },
-                { data: 'supplier_registered' },
-                { data: 'retailer' },
-                { data: 'region' },
-                { data: 'balance_status' },
-                { data: 'source' },
+                { data: 'id', className: 'text-center align-middle'},
+                { data: 'status', className: 'text-center align-middle'},
+                { data: 'local_balance', className: 'text-center align-middle'},
+                { data: 'title', className: 'text-center align-middle'},
+                { data: 'balance', visible: false },
+                { data: 'recommended_payment', visible: false },
+                { data: 'previous_period_amount', visible: false },
+                { data: 'type', visible: false },
+                { data: 'number', visible: false },
+                { data: 'date', visible: false },
+                { data: 'phone', visible: false },
+                { data: 'create_deals', visible: false },
+                { data: 'export_start_date', visible: false },
+                { data: 'export_week_days', className: 'text-center align-middle'},
+                { data: 'export_frequency', visible: false },
+                { data: 'payment_total', visible: false },
+                { data: 'payment_type', visible: false },
+                { data: 'export_total_count', visible: false },
+                { data: 'attorney_date', visible: false },
+                { data: 'price', className: 'text-center align-middle'},
+                { data: 'price_fruits_vegetables', className: 'text-center align-middle'},
+                { data: 'price_bakery', className: 'text-center align-middle'},
+                { data: 'price_dairy', className: 'text-center align-middle'},
+                { data: 'price_used_oil', className: 'text-center align-middle'},
+                { data: 'price_grocery', className: 'text-center align-middle'},
+                { data: 'price_waste', className: 'text-center align-middle'},
+                { data: 'other', className: 'text-center align-middle'},
+                { data: 'city', visible: false },
+                { data: 'shipment', visible: false },
+                { data: 'process', visible: false },
+                { data: 'supplier_registered', visible: false },
+                { data: 'retailer', visible: false },
+                { data: 'region', visible: false },
+                { data: 'balance_status', visible: false },
+                { data: 'source', visible: false },
             ],
+            createdRow: function(row, data, dataIndex) {
+                $(row).find('td:eq(2)').attr('contenteditable', 'true');  // Делаем редактируемой только 2-ю колонку (local_balance)
+            },
             language: {
                 url: "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"
             }
         });
+
+
+        // Очистка текста при начале редактирования
+        $('#contracts tbody').on('focus', 'td[contenteditable="true"]', function() {
+            var cellText = $(this).text();
+            var cleanedText = cellText.replace(/[^0-9.-]/g, '');
+            $(this).text(cleanedText);
+        });
+
+        // Ограничение ввода только числами, точкой и минусом
+        $('#contracts tbody').on('keypress', 'td[contenteditable="true"]', function(e) {
+            var charCode = (e.which) ? e.which : e.keyCode;
+
+            // Разрешаем: цифры (0-9), точку (.), минус (-)
+            if (
+                (charCode < 48 || charCode > 57) &&  // Не цифры
+                charCode !== 46 &&  // Не точка
+                charCode !== 45     // Не минус
+            ) {
+                return false;
+            }
+
+            // Запрещаем ввод больше одной точки
+            if (charCode === 46 && $(this).text().includes('.')) {
+                return false;
+            }
+
+            // Запрещаем ввод больше одного знака минус
+            if (charCode === 45 && $(this).text().includes('-')) {
+                return false;
+            }
+
+            // Минус можно вводить только в начале
+            if (charCode === 45 && $(this).text().length > 0) {
+                return false;
+            }
+
+            return true;
+        });
+
+        // Сохранение изменений при потере фокуса
+        $('#contracts tbody').on('blur', 'td[contenteditable="true"]', function() {
+            var cellData = $(this).text().trim();  // Получаем новое значение и обрезаем пробелы
+            var rowIndex = table.row($(this).closest('tr')).index();  // Индекс строки
+            var columnIndex = table.cell(this).index().column;  // Индекс колонки
+
+            // Получаем всю строку данных
+            var rowData = table.row(rowIndex).data();
+
+            // Отправляем данные на сервер для сохранения
+            $.ajax({
+                url: '{{ route('contract.changeBalance') }}',  // URL для сохранения данных
+                method: 'POST',
+                data: {
+                    row: rowData.id,  // Уникальный ID строки
+                    column: columnIndex,
+                    value: cellData,
+                    _token: $('meta[name="csrf-token"]').attr('content')  // CSRF-токен для Laravel
+                },
+                success: function(response) {
+                    toastr.success(response.message);
+                    table.ajax.reload();
+                },
+                error: function(xhr) {
+                    toastr.error(xhr.responseJSON.message);
+                }
+            });
+
+        });
+
+
+        var urlParams = new URLSearchParams(window.location.search);
+        var searchTerm = urlParams.get('search');
+        if (searchTerm) {
+            table.search(searchTerm).draw();
+        }
 
         table.on('mouseenter', 'td', function () {
             let colIdx = table.cell(this).index().column;

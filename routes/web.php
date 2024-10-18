@@ -15,12 +15,14 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
     Route::any('/setup', [SetupController::class, 'setup'])->name('setup');
 
     Route::name('entry.')->prefix('entry')->group(function () {
-        Route::get('/list', [EntryController::class, 'list'])->name('list');
+        Route::get('/list/{type?}', [EntryController::class, 'list'])->name('list');
         Route::get('/data', [EntryController::class, 'data'])->name('data');
         Route::get('/detail/{entry}', [EntryController::class, 'detail'])->name('detail');
         Route::post('/store', [EntryController::class, 'store'])->name('store');
         Route::patch('/update/{entry}', [EntryController::class, 'update'])->name('update');
         Route::delete('/delete', [EntryController::class, 'delete'])->name('delete');
+        Route::patch('/passed', [EntryController::class, 'passed'])->name('passed');
+        Route::patch('/ignore/{type}', [EntryController::class, 'ignore'])->name('ignore');
     });
 
     Route::name('write-off.')->prefix('write-off')->group(function () {
@@ -30,7 +32,12 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
         Route::post('/store', [WriteOffController::class, 'store'])->name('store');
         Route::post('/upload', [WriteOffController::class, 'upload'])->name('upload');
         Route::patch('/update/{writeoff}', [WriteOffController::class, 'update'])->name('update');
+        Route::patch('/passed', [WriteOffController::class, 'passed'])->name('passed');
+        Route::patch('/canceled', [WriteOffController::class, 'canceled'])->name('canceled');
+        Route::patch('/free', [WriteOffController::class, 'free'])->name('free');
         Route::delete('/delete', [WriteOffController::class, 'delete'])->name('delete');
+        Route::patch('/comment/{writeoff}', [WriteOffController::class, 'comment'])->name('comment');
+
     });
 
     Route::name('supplier.')->prefix('supplier')->group(function () {
@@ -45,6 +52,7 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
         Route::get('/list', [ContractController::class, 'list'])->name('list');
         Route::get('/data', [ContractController::class, 'data'])->name('data');
         Route::get('/getNames', [ContractController::class, 'getNames'])->name('getNames');
+        Route::post('/changeBalance', [ContractController::class, 'changeBalance'])->name('changeBalance');
     });
 
 

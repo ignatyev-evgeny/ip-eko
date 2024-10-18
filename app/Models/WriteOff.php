@@ -6,9 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class WriteOff extends Model {
     protected $fillable = [
+        'status',
+        'comment',
         'external',
+        'store_number',
         'store',
         'date',
+        'day_of_week',
         'total_weight',
         'total_amount',
         'total_detail',

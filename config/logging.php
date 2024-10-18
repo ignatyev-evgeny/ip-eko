@@ -53,8 +53,8 @@ return [
     'channels' => [
 
         'import' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/import/'.date('d.m.Y').'/import.log'),
+            'driver' => 'daily',
+            'path' => storage_path('logs/import.log'),
             'level' => 'debug',
         ],
 

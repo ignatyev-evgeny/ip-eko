@@ -23,7 +23,7 @@ class IndexController extends Controller {
                 $issetIntegration = SberIntegration::find(1);
 
                 $client_id = !empty($issetIntegration->client_id) ? $issetIntegration->client_id : '9672';
-                $client_secret = !empty($issetIntegration->client_secret) ? $issetIntegration->client_secret : 'nJ8X8w9W';
+                $client_secret = !empty($issetIntegration->client_secret) ? $issetIntegration->client_secret : 'je5r6h00';
 
                 $response = Http::withOptions([
                     'cert' => '/var/www/ip-eko.bitrix.expert/html/storage/crt/SBBAPI_9672_7953ec3e-1851-4411-b953-5fd5d168cdc5.pem', '0328Dima',
