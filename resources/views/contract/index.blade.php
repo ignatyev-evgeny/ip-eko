@@ -180,7 +180,7 @@
                 { data: 'source', visible: false },
             ],
             createdRow: function(row, data, dataIndex) {
-                $(row).find('td:eq(2)').attr('contenteditable', 'true');  // Делаем редактируемой только 2-ю колонку (local_balance)
+                //$(row).find('td:eq(2)').attr('contenteditable', 'true');  // Делаем редактируемой только 2-ю колонку (local_balance)
             },
             language: {
                 url: "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"
@@ -247,10 +247,10 @@
                 },
                 success: function(response) {
                     toastr.success(response.message);
-                    table.ajax.reload();
                 },
                 error: function(xhr) {
                     toastr.error(xhr.responseJSON.message);
+                    table.ajax.reload();
                 }
             });
 

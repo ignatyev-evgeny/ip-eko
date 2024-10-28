@@ -359,7 +359,7 @@ class WriteOffController extends Controller {
                     continue;
                 }
 
-                $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+                $contract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($entry->contract) . "%")->first();
 
                 if(empty($contract)) {
                     continue;
@@ -419,7 +419,7 @@ class WriteOffController extends Controller {
                         continue;
                     }
 
-                    $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+                    $contract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($entry->contract) . "%")->first();
 
                     if(empty($contract)) {
                         continue;
@@ -482,7 +482,7 @@ class WriteOffController extends Controller {
                         continue;
                     }
 
-                    $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+                    $contract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($entry->contract) . "%")->first();
 
                     if(empty($contract)) {
                         continue;

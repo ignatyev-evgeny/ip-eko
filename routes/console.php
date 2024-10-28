@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\createOrUpdateContractsCommand;
+use App\Console\Commands\EntriesFindToPassedCommand;
 use App\Console\Commands\getPaymentsFromSberBankCommand;
 use App\Console\Commands\updateAccessTokenCommand;
 use App\Console\Commands\updateAccessTokenSberBankIntegrationCommand;
@@ -15,6 +16,7 @@ Artisan::command('inspire', function () {
 
 Schedule::command(updateAccessTokenCommand::class)->everyMinute();
 Schedule::command(WriteOffsFindToPassedCommand::class)->everyMinute();
+Schedule::command(EntriesFindToPassedCommand::class)->everyMinute();
 Schedule::command(updateAccessTokenSberBankIntegrationCommand::class)->everyFifteenMinutes();
 Schedule::command(getPaymentsFromSberBankCommand::class)->everyTenMinutes();
 Schedule::command(createOrUpdateContractsCommand::class)->everyThirtyMinutes();

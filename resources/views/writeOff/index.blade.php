@@ -70,93 +70,93 @@
 <div class="container-fluid py-3">
     <main class="m-auto">
 
-{{--        <p class="d-inline-flex gap-1 w-100">--}}
-{{--            <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">--}}
-{{--                Добавить списание--}}
-{{--            </button>--}}
-{{--        </p>--}}
+        <p class="d-inline-flex gap-1 w-100">
+            <button class="btn btn-primary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                Добавить списание
+            </button>
+        </p>
 
-{{--        <div class="collapse mb-5" id="collapseExample">--}}
-{{--            <form id="writeOffForm">--}}
-{{--                <div class="card card-body">--}}
-{{--                    <div class="row align-items-center">--}}
-{{--                        <div class="col-10">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <label for="contract" class="form-label">Договор</label>--}}
-{{--                                <input type="text" class="form-control contractInput" name="contract" id="contract" aria-describedby="contractInput">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-2">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <label for="retailer" class="form-label">Ретейлер</label>--}}
-{{--                                <input type="text" class="form-control" name="retailer" id="retailer">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    <div class="row">--}}
-{{--                        <div class="col-4">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <label for="external" class="form-label">Номер магазина</label>--}}
-{{--                                <input type="text" class="form-control" name="external" id="external">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-4">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <label for="store" class="form-label">Адрес магазина</label>--}}
-{{--                                <input type="text" class="form-control" name="store" id="store">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-4">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <label for="counteragent" class="form-label">Контрагент (Клиент)</label>--}}
-{{--                                <input type="text" class="form-control" name="counteragent" id="counteragent">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    <div class="row">--}}
-{{--                        <div class="col-4">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <label for="date" class="form-label">Дата</label>--}}
-{{--                                <input type="date" name="date" class="form-control" id="date">--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-4">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <div class="d-flex justify-content-between align-items-center">--}}
-{{--                                    <label for="total_weight" class="form-label">Отгружено</label>--}}
-{{--                                    <div class="form-check form-switch">--}}
-{{--                                        <input class="form-check-input" type="checkbox" id="detailToggle">--}}
-{{--                                        <label class="form-check-label" for="detailToggle">Детальный вид</label>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                                <div class="input-group">--}}
-{{--                                    <input type="text" class="form-control" name="total_weight" id="total_weight">--}}
-{{--                                    <span class="input-group-text">кг.</span>--}}
-{{--                                    <span class="input-group-text">0.00</span>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                        <div class="col-4">--}}
-{{--                            <div class="mb-3">--}}
-{{--                                <label for="total_amount" class="form-label">Сумма</label>--}}
-{{--                                <div class="input-group">--}}
-{{--                                    <input type="text" class="form-control" name="total_amount" id="total_amount">--}}
-{{--                                    <span class="input-group-text">₽</span>--}}
-{{--                                    <span class="input-group-text">0.00</span>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    <div class="additionalFields"></div>--}}
+        <div class="collapse mb-5" id="collapseExample">
+            <form id="writeOffForm">
+                <div class="card card-body">
+                    <div class="row align-items-center">
+                        <div class="col-10">
+                            <div class="mb-3">
+                                <label for="contract" class="form-label">Договор</label>
+                                <input type="text" class="form-control contractInput" name="contract" id="contract" aria-describedby="contractInput">
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="mb-3">
+                                <label for="retailer" class="form-label">Ретейлер</label>
+                                <input type="text" class="form-control" name="retailer" id="retailer">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label for="external" class="form-label">Номер магазина</label>
+                                <input type="text" class="form-control" name="external" id="external">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label for="store" class="form-label">Адрес магазина</label>
+                                <input type="text" class="form-control" name="store" id="store">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label for="counteragent" class="form-label">Контрагент (Клиент)</label>
+                                <input type="text" class="form-control" name="counteragent" id="counteragent">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label for="date" class="form-label">Дата</label>
+                                <input type="date" name="date" class="form-control" id="date">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label for="total_weight" class="form-label">Отгружено</label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="detailToggle">
+                                        <label class="form-check-label" for="detailToggle">Детальный вид</label>
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="total_weight" id="total_weight">
+                                    <span class="input-group-text">кг.</span>
+                                    <span class="input-group-text">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-3">
+                                <label for="total_amount" class="form-label">Сумма</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="total_amount" id="total_amount">
+                                    <span class="input-group-text">₽</span>
+                                    <span class="input-group-text">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="additionalFields"></div>
 
-{{--                    <div class="row">--}}
-{{--                        <div class="col-12">--}}
-{{--                            <button type="submit" class="btn btn-success w-100">Добавить новое списание</button>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </form>--}}
-{{--        </div>--}}
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-success w-100">Добавить новое списание</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
 
         <div id="filters-container" class="d-flex align-items-center mb-3">
             <div id="status-filter-buttons" class="d-flex me-3">
@@ -716,7 +716,7 @@
                 { data: 'status', sortable: false, className: 'text-center align-middle' },
                 // { data: 'external', sortable: false, visible: false, className: 'text-center align-middle' },
                 { data: 'date', className: 'text-center align-middle' },
-                { data: 'comment', className: 'text-center align-middle' },
+                { data: 'comment', className: 'text-center align-middle', defaultContent: '' },
                 { data: 'store', sortable: false, className: 'text-center align-middle' },
                 { data: 'total_weight', sortable: false, className: 'text-center align-middle' },
                 { data: 'total_amount', sortable: false, className: 'text-center align-middle' },

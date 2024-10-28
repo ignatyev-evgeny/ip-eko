@@ -138,7 +138,7 @@ class EntryController extends Controller {
                     continue;
                 }
 
-                $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($entry->contract))->first();
+                $contract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($entry->contract) . "%")->first();
 
                 if(empty($contract)) {
                     continue;
