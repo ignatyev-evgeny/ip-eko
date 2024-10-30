@@ -3,18 +3,20 @@
 <html lang="en" data-bs-theme="auto">
 @include('chunk.head')
 <body>
-<div class="container">
-    <header class="d-flex justify-content-center py-3">
-        <ul class="nav nav-pills">
-            <li class="nav-item"><a href="{{ route('index') }}" class="nav-link">Главная</a></li>
-{{--            <li class="nav-item"><a href="{{ route('supplier.list') }}" class="nav-link">Поставщики</a></li>--}}
-{{--            <li class="nav-item"><a href="{{ route('client.list') }}" class="nav-link" >Клиенты</a></li>--}}
-            <li class="nav-item"><a href="{{ route('contract.list') }}" class="nav-link" aria-current="page">Договоры</a></li>
-            <li class="nav-item"><a href="{{ route('entry.list') }}" class="nav-link">Поступления</a></li>
-            <li class="nav-item"><a href="{{ route('write-off.list') }}" class="nav-link">Списания</a></li>
-        </ul>
-    </header>
-</div>
+@if(empty($balanceFrame) || !$balanceFrame)
+    <div class="container">
+        <header class="d-flex justify-content-center py-3">
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a href="{{ route('index') }}" class="nav-link">Главная</a></li>
+                {{--            <li class="nav-item"><a href="{{ route('supplier.list') }}" class="nav-link">Поставщики</a></li>--}}
+                {{--            <li class="nav-item"><a href="{{ route('client.list') }}" class="nav-link" >Клиенты</a></li>--}}
+                <li class="nav-item"><a href="{{ route('contract.list') }}" class="nav-link" aria-current="page">Договоры</a></li>
+                <li class="nav-item"><a href="{{ route('entry.list') }}" class="nav-link">Поступления</a></li>
+                <li class="nav-item"><a href="{{ route('write-off.list') }}" class="nav-link">Списания</a></li>
+            </ul>
+        </header>
+    </div>
+@endif
 <div class="container-fluid py-3">
     <main class="m-auto">
         <div class="row">

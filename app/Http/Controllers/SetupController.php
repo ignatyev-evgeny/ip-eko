@@ -15,6 +15,7 @@ class SetupController extends Controller {
     protected string $clientId;
 
     protected string $clientSecret;
+    public const PLACEMENT_SMART_PROCESS = 'CRM_DYNAMIC_172_DETAIL_TAB';
 
     public function __construct()
     {
@@ -73,7 +74,24 @@ class SetupController extends Controller {
                 'last_update' => Carbon::now()->timestamp,
             ]);
 
-            return view('setup');
+            $availablePlacements = $this->getAvailablePlacements($tokens->access_token, $request['DOMAIN']);
+
+            if(!in_array(self::PLACEMENT_SMART_PROCESS, $availablePlacements)) {
+                $message = "Смарт процесс " . self::PLACEMENT_SMART_PROCESS . " не найден на стороне портала - " . $request['DOMAIN'];
+                Log::critical($message);
+                abort(404, $message);
+            }
+
+            $placementBindResponse = $this->bindPlacement(self::PLACEMENT_SMART_PROCESS, $tokens->access_token, $request['DOMAIN']);
+
+            if (!empty($placementBindResponse['error']) && $placementBindResponse['error_description'] == 'Unable to set placement handler: Handler already binded') {
+                $this->unbindPlacement(self::PLACEMENT_SMART_PROCESS, $tokens->access_token, $request['DOMAIN']);
+                $this->bindPlacement(self::PLACEMENT_SMART_PROCESS, $tokens->access_token, $request['DOMAIN']);
+            }
+
+            return view('setup', [
+                'iframe' => $request->server()['HTTP_SEC_FETCH_DEST'] == 'iframe',
+            ]);
 
         } catch (Exception $exception) {
             report($exception);

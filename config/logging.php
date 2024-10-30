@@ -52,6 +52,12 @@ return [
 
     'channels' => [
 
+        'critical' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/critical.log'),
+            'level' => 'critical',
+        ],
+
         'import' => [
             'driver' => 'daily',
             'path' => storage_path('logs/import.log'),

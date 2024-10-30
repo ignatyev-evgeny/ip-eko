@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Http;
 
 class IndexController extends Controller {
 
+    public const PLACEMENT_SMART_PROCESS = 'CRM_DYNAMIC_172_DETAIL_TAB';
+
     public function index(Request $request) {
 
         try {
@@ -49,6 +51,20 @@ class IndexController extends Controller {
                     'response' => $data,
                 ]);
 
+            }
+
+            if($request->PLACEMENT == self::PLACEMENT_SMART_PROCESS) {
+                $placement = json_decode($request->PLACEMENT_OPTIONS, true)['ID'];
+
+                $contract = Contract::where('bitrix_id', $placement)->first();
+                $contract->load('transactions');
+
+                return view('contract.history', [
+                    'iframe' => $request->server()['HTTP_SEC_FETCH_DEST'] == 'iframe',
+                    'contract' => $contract,
+                    'transactions' => $contract->transactions,
+                    'balanceFrame' => true
+                ]);
             }
 
             return view('index', [
