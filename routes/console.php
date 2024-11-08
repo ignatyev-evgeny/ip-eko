@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\createOrUpdateContractsCommand;
+use App\Console\Commands\creteOrUpdateClientsCommand;
 use App\Console\Commands\EntriesFindToPassedCommand;
 use App\Console\Commands\getPaymentsFromSberBankCommand;
 use App\Console\Commands\updateAccessTokenCommand;
@@ -20,4 +21,5 @@ Schedule::command(EntriesFindToPassedCommand::class)->everyMinute();
 Schedule::command(updateAccessTokenSberBankIntegrationCommand::class)->everyFifteenMinutes();
 Schedule::command(getPaymentsFromSberBankCommand::class)->everyTenMinutes();
 Schedule::command(createOrUpdateContractsCommand::class)->everyThirtyMinutes();
+Schedule::command(creteOrUpdateClientsCommand::class)->everyThirtyMinutes();
 Schedule::command(updateClientIDSberBankIntegrationCommand::class)->cron('0 0 */15 * *');

@@ -44,22 +44,9 @@
                 <th>Статус договора</th>
                 <th>Локальный баланс</th>
                 <th></th>
+                <th>Ритейлер</th>
                 <th>Название</th>
-                <th >Баланс</th>
-                <th>Рекомендуемый платеж</th>
-                <th>Сумма отгрузки за предыдущий период</th>
-                <th>Тип договора</th>
-                <th>Номер</th>
-                <th>Дата</th>
-                <th>Телефон</th>
-                <th>Создать сделки</th>
-                <th>Дата начала вывоза</th>
                 <th>Дни недели вывоза</th>
-                <th>Периодичность вывоза</th>
-                <th>Сумма платежа</th>
-                <th>Тип платежа</th>
-                <th>Вывезено кг (Для сообщения)</th>
-                <th>Текущая дата доверенности</th>
                 <th>Цена</th>
                 <th>Фрукты овощи</th>
                 <th>Хлебобулочные изделия</th>
@@ -68,14 +55,6 @@
                 <th>Бакалея</th>
                 <th>Пищевой отход</th>
                 <th>Иное</th>
-                <th>Город</th>
-                <th>№ отгрузки</th>
-                <th>ID Процесса</th>
-                <th>Учтен в поставщике?</th>
-                <th>Ритейлер</th>
-                <th>Регион</th>
-                <th>Статус баланса</th>
-                <th>Источник</th>
             </tr>
             </thead>
             <tbody>
@@ -95,7 +74,6 @@
         });
         BX24.fitWindow()
         @endif
-
 
         const table = $('#contracts').DataTable({
             scrollX: true,
@@ -146,22 +124,9 @@
                 { data: 'status', className: 'text-center align-middle'},
                 { data: 'local_balance', className: 'text-center align-middle'},
                 { data: 'balance_history', className: 'text-center align-middle', sortable: false},
+                { data: 'retailer', className: 'text-center align-middle'},
                 { data: 'title', className: 'text-center align-middle'},
-                { data: 'balance', visible: false },
-                { data: 'recommended_payment', visible: false },
-                { data: 'previous_period_amount', visible: false },
-                { data: 'type', visible: false },
-                { data: 'number', visible: false },
-                { data: 'date', visible: false },
-                { data: 'phone', visible: false },
-                { data: 'create_deals', visible: false },
-                { data: 'export_start_date', visible: false },
                 { data: 'export_week_days', className: 'text-center align-middle'},
-                { data: 'export_frequency', visible: false },
-                { data: 'payment_total', visible: false },
-                { data: 'payment_type', visible: false },
-                { data: 'export_total_count', visible: false },
-                { data: 'attorney_date', visible: false },
                 { data: 'price', className: 'text-center align-middle'},
                 { data: 'price_fruits_vegetables', className: 'text-center align-middle'},
                 { data: 'price_bakery', className: 'text-center align-middle'},
@@ -170,23 +135,38 @@
                 { data: 'price_grocery', className: 'text-center align-middle'},
                 { data: 'price_waste', className: 'text-center align-middle'},
                 { data: 'other', className: 'text-center align-middle'},
-                { data: 'city', visible: false },
-                { data: 'shipment', visible: false },
-                { data: 'process', visible: false },
-                { data: 'supplier_registered', visible: false },
-                { data: 'retailer', visible: false },
-                { data: 'region', visible: false },
-                { data: 'balance_status', visible: false },
-                { data: 'source', visible: false },
             ],
             createdRow: function(row, data, dataIndex) {
                 //$(row).find('td:eq(2)').attr('contenteditable', 'true');  // Делаем редактируемой только 2-ю колонку (local_balance)
             },
             language: {
                 url: "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"
+            },
+            initComplete: function() {
+                // Создаем контейнер для выпадающего списка рядом с кнопками
+                const retailerFilter = `<select id="retailerFilter" class="form-control ml-2 mt-2"><option value="">Без сортировки</option></select>`;
+
+                // Вставляем выпадающий список рядом с кнопками
+                $('.dt-buttons').append(retailerFilter);
+
+                // Динамическое заполнение выпадающего списка
+                $.ajax({
+                    url: '{{ route('contract.get.retailers') }}',
+                    method: 'GET',
+                    success: function(data) {
+                        data.forEach(function(retailer) {
+                            $('#retailerFilter').append(new Option(retailer, retailer));
+                        });
+                    }
+                });
+
+                // Обработчик изменения значения для фильтрации
+                $('#retailerFilter').on('change', function () {
+                    const retailer = $(this).val();
+                    table.columns(4).search(retailer).draw();
+                });
             }
         });
-
 
         // Очистка текста при начале редактирования
         $('#contracts tbody').on('focus', 'td[contenteditable="true"]', function() {

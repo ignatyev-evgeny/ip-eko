@@ -133,7 +133,11 @@ class createOrUpdateContractsCommand extends Command {
                     'title' => trim($contract->title),
                     'status' => !empty($contract->ufCrm9_1707197191281) && isset($field['ufCrm9_1707197191281']) ? $field['ufCrm9_1707197191281'][$contract->ufCrm9_1707197191281] : null,
                     'number' => $contract->ufCrm9_1707202290201,
+                    'date' => $contract->ufCrm9_1707202457837 ?? null,
                     'export_week_days' =>  $export_week_days ?? [],
+                    'client' => $contract->ufCrm9_1731074441110 ?? null,
+                    'shop' => $contract->ufCrm9_1731074393850 ?? null,
+                    'shop_address' => $contract->ufCrm9_1731074402117 ?? null,
                     'price' => $price['fix'],
                     'price_fruits_vegetables' => $price['price_fruits_vegetables'],
                     'price_bakery' => $price['price_bakery'],
@@ -148,7 +152,7 @@ class createOrUpdateContractsCommand extends Command {
 //                Contract::updateOrCreate([
 //                    'bitrix_id' => $contract->id,
 //                ], [
-//                    'client_id' => $contract->parentId164,
+//                'client_id' => $contract->parentId164,
 //                    'supplier_id' => $contract->parentId180,
 //                    'title' => $contract->title,
 //                    'balance' => $contract->ufCrm9_1706097377335,

@@ -102,8 +102,8 @@ class ProcessWriteOffsImport implements ShouldQueue
 
                     $contractQuery = Contract::where('status', 'Активный')
                         ->whereJsonContains('export_week_days', $dayOfWeek)
-                        ->whereRaw("title LIKE '% / %'")
-                        ->where('title', 'LIKE', '%' . $row['zavod'] . '%')
+                        ->whereRaw("title LIKE '% /BH %'")
+                        ->where('title', 'LIKE', '%BH ' . $row['zavod'] . ' %')
                         ->where('retailer', 'Перекресток');
 
                     if ($contractQuery->exists()) {

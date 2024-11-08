@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Contract;
 use App\Models\ContractsBalanceHistory;
+use Carbon\Carbon;
 use DB;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,6 +16,12 @@ class ContractController extends Controller {
             'contracts' => Contract::all(),
             'iframe' => $request->server()['HTTP_SEC_FETCH_DEST'] == 'iframe',
         ]);
+    }
+
+    public function getRetailers()
+    {
+        $retailers = Contract::select('retailer')->distinct()->pluck('retailer');
+        return response()->json($retailers);
     }
 
     public function data()
@@ -71,6 +78,7 @@ class ContractController extends Controller {
                 return $row->other.' ₽';
             })
 
+
             ->rawColumns([
                 'title',
                 'balance_history',
@@ -82,11 +90,28 @@ class ContractController extends Controller {
     public function getNames(Request $request) {
         $term = $request->get('term', '');
         $contracts = Contract::where('title', 'LIKE', '%' . $term . '%')
-            ->select('status', 'title', 'bitrix_id')
             ->orderBy('status', 'ASC')
             ->get();
         $formattedContracts = $contracts->map(function ($contract) {
-            return $contract->status . ' - ' . $contract->title;
+            return [
+                'title' => $contract->status . ' - ' . $contract->title,
+                'bitrix_id' => $contract->bitrix_id,
+                'retailer' => $contract->retailer,
+                'date' => Carbon::parse($contract->date)->format('Y-m-d'),
+                'client' => $contract->client,
+                'shop' => $contract->shop,
+                'shop_address' => $contract->shop_address,
+                'price' => [
+                    'price' => $contract->price,
+                    'price_fruits_vegetables' => $contract->price_fruits_vegetables,
+                    'price_bakery' => $contract->price_bakery,
+                    'price_dairy' => $contract->price_dairy,
+                    'price_used_oil' => $contract->price_used_oil,
+                    'price_grocery' => $contract->price_grocery,
+                    'price_waste' => $contract->price_waste,
+                    'other' => $contract->other,
+                ]
+            ];
         });
         return response()->json($formattedContracts);
     }

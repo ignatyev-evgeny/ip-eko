@@ -9,6 +9,9 @@ class Contract extends Model {
     protected $fillable = [
         'bitrix_id',
         'client_id',
+        'client',
+        'shop',
+        'shop_address',
         'supplier_id',
         'title',
         'balance',
@@ -91,6 +94,11 @@ class Contract extends Model {
     ];
 
     public function transactions(): HasMany
+    {
+        return $this->hasMany(ContractsBalanceHistory::class, 'contract_id', 'id');
+    }
+
+    public function counteragent(): HasMany
     {
         return $this->hasMany(ContractsBalanceHistory::class, 'contract_id', 'id');
     }

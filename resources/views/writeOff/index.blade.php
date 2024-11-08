@@ -287,7 +287,7 @@
                         </div>
                         <div class="form-group">
                             <label for="fileInput">Выберите файл</label>
-                            <input type="file" id="fileInput" class="form-control-file" accept=".csv" required>
+                            <input type="file" id="fileInput" class="form-control-file" accept=".csv, .xls, .xlsx" required>
                         </div>
                     </form>
                 </div>
@@ -1075,7 +1075,13 @@
                         term: request.term
                     },
                     success: function(data) {
-                        response(data);
+                        /** Преобразуем данные так, чтобы каждый элемент содержал `label` (для отображения) и `value` (для использования) */
+                        const results = data.map(item => ({
+                            label: item.title, // Отображаемое значение в списке
+                            value: item.title, // Значение, устанавливаемое в поле при выборе
+                            data: item // Сохраняем весь объект для использования в `select`
+                        }));
+                        response(results);
                     },
                     error: function(xhr) {
                         console.error(xhr.responseText);
@@ -1084,7 +1090,31 @@
             },
             minLength: 2, // Минимальное количество символов для начала поиска
             select: function(event, ui) {
+                /** Устанавливаем `title` как значение в поле `contract` */
                 $("#contract").val(ui.item.value);
+
+                /** Подставляем остальные значения в соответствующие поля */
+                const selectedData = ui.item.data;
+                $("#bitrix_id").val(selectedData.bitrix_id);
+                $("#retailer").val(selectedData.retailer);
+                $("#date").val(selectedData.date);
+                $("#external").val(selectedData.shop);
+                $("#store").val(selectedData.shop_address);
+                $("#counteragent").val(selectedData.client);
+
+                if (!$("#detailToggle").is(':checked')) {
+                    $("#detailToggle").trigger('click');
+                }
+
+
+                $("#fruits_price").val(selectedData.price.price_fruits_vegetables || selectedData.price.price);
+                $("#bread_price").val(selectedData.price.price_bakery || selectedData.price.price);
+                $("#milk_price").val(selectedData.price.price_dairy || selectedData.price.price);
+                $("#used_vegetable_oil_price").val(selectedData.price.price_used_oil || selectedData.price.price);
+                $("#groceries_price").val(selectedData.price.price_grocery || selectedData.price.price);
+                $("#food_waste_price").val(selectedData.price.price_waste || selectedData.price.price);
+                $("#other_price").val(selectedData.price.other || selectedData.price.price);
+
                 return false;
             }
         });

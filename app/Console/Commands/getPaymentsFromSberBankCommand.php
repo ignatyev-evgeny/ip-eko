@@ -78,7 +78,7 @@ class getPaymentsFromSberBankCommand extends Command {
             $uuids = array_column($entries, 'uuid');
             $existingEntries = Entry::whereIn('uuid', $uuids)->get()->keyBy('uuid');
             $filteredEntries = array_filter($entries, function($entry) use ($existingEntries) {
-                if (isset($existingEntries[$entry['uuid']]) && $existingEntries[$entry['uuid']]->status === 'passed') {
+                if ((isset($existingEntries[$entry['uuid']]) && $existingEntries[$entry['uuid']]->status === 'passed') || (isset($existingEntries[$entry['uuid']]) && !empty($existingEntries[$entry['uuid']]->contract))) {
                     return false;
                 }
                 return true;
