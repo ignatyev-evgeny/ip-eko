@@ -623,8 +623,15 @@ class WriteOffController extends Controller {
             ], 400);
         }
 
-        foreach ($request['writeoffs'] as $entry) {
-            WriteOff::where('id', $entry)->delete();
+        foreach ($request['writeoffs'] as $writeoff) {
+
+            $writeoffDetail = WriteOff::where('id', $writeoff)->first();
+
+            if($writeoffDetail->status == 'passed') {
+                continue;
+            }
+
+            $writeoffDetail->delete();
         }
 
         return response()->json([

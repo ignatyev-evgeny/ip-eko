@@ -41,6 +41,7 @@
             <thead>
             <tr>
                 <th>ID</th>
+                <th>ВН</th>
                 <th>Статус договора</th>
                 <th>Локальный баланс</th>
                 <th></th>
@@ -121,6 +122,7 @@
             ],
             columns: [
                 { data: 'id', className: 'text-center align-middle'},
+                { data: 'shop', className: 'text-center align-middle'},
                 { data: 'status', className: 'text-center align-middle'},
                 { data: 'local_balance', className: 'text-center align-middle'},
                 { data: 'balance_history', className: 'text-center align-middle', sortable: false},
@@ -160,10 +162,22 @@
                     }
                 });
 
+                // Поле для поиска по второму столбцу
+                const shopFilter = `<input type="text" id="shopFilter" class="form-control ml-2 mt-2" placeholder="Поиск по ВН">`;
+
+// Вставляем текстовое поле рядом с кнопками
+                $('.dt-buttons').append(shopFilter);
+
+// Обработчик изменения значения для фильтрации второго столбца
+                $('#shopFilter').on('keyup', function () {
+                    const shop = $(this).val();
+                    table.columns(1).search(shop).draw();
+                });
+
                 // Обработчик изменения значения для фильтрации
                 $('#retailerFilter').on('change', function () {
                     const retailer = $(this).val();
-                    table.columns(4).search(retailer).draw();
+                    table.columns(5).search(retailer).draw();
                 });
             }
         });

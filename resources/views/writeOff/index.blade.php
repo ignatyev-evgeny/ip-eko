@@ -1220,7 +1220,13 @@
                         term: request.term
                     },
                     success: function(data) {
-                        response(data);
+                        /** Преобразуем данные так, чтобы каждый элемент содержал `label` (для отображения) и `value` (для использования) */
+                        const results = data.map(item => ({
+                            label: item.title, // Отображаемое значение в списке
+                            value: item.title, // Значение, устанавливаемое в поле при выборе
+                            data: item // Сохраняем весь объект для использования в `select`
+                        }));
+                        response(results);
                     },
                     error: function(xhr) {
                         console.error(xhr.responseText);
