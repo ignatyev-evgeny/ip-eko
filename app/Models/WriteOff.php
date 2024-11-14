@@ -17,6 +17,7 @@ class WriteOff extends Model {
         'total_amount',
         'total_detail',
         'counteragent',
+        'contract_id',
         'contract',
         'retailer',
     ];
