@@ -9,6 +9,7 @@ use App\Models\Entry;
 use App\Models\EntryIgnore;
 use Carbon\Carbon;
 use DB;
+use Dflydev\DotAccessData\Data;
 use Exception;
 use Illuminate\Http\Request;
 use Str;
@@ -98,6 +99,68 @@ class EntryController extends Controller {
         ], 201);
     }
 
+    public function transfer(Entry $entry, Request $request) {
+
+        if(empty($request->new_contract)) {
+            return response()->json([
+                'message' => 'Невозможно перенести платеж, если новый договор не заполнен',
+            ], 404);
+        }
+
+        if(empty($request->contract)) {
+            return response()->json([
+                'message' => 'Невозможно перенести платеж, если договор не заполнен',
+            ], 404);
+        }
+
+        $contract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($request->contract) . "%")->first();
+        $newContract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($request->new_contract) . "%")->first();
+
+        if(empty($newContract)) {
+            return response()->json([
+                'message' => 'Невозможно перенести платеж, введенный договор не найден на стороне приложения',
+            ], 404);
+        }
+
+        if(empty($contract)) {
+            return response()->json([
+                'message' => 'Невозможно перенести платеж, введенный указанный договор не найден на стороне приложения',
+            ], 404);
+        }
+
+        $contractBalanceSnapshot = $contract->local_balance;
+        $newContractBalanceSnapshot = $newContract->local_balance;
+
+        $contract->local_balance = $contract->local_balance - floatval($entry->amount);
+        $contract->save();
+
+        $newContract->local_balance = $newContract->local_balance + floatval($entry->amount);
+        $newContract->save();
+
+
+        ContractsBalanceHistory::create([
+            'contract_id' => $contract->id,
+            'start_balance' => $contractBalanceSnapshot,
+            'amount' => -floatval($entry->amount),
+            'end_balance' => $contractBalanceSnapshot - floatval($entry->amount),
+        ]);
+
+        ContractsBalanceHistory::create([
+            'contract_id' => $newContract->id,
+            'start_balance' => $newContractBalanceSnapshot,
+            'amount' => floatval($entry->amount),
+            'end_balance' => $newContractBalanceSnapshot + floatval($entry->amount),
+        ]);
+
+        $entry->contract = $newContract->title;
+        $entry->save();
+
+        return response()->json([
+            'message' => 'Пополнение успешно перенесено',
+            'entry' => $entry,
+        ], 201);
+    }
+
     public function delete(Request $request) {
 
         if(empty($request['entries'])) {
@@ -134,6 +197,7 @@ class EntryController extends Controller {
                     continue;
                 }
 
+
                 if(empty($entry->contract)) {
                     continue;
                 }
@@ -152,10 +216,13 @@ class EntryController extends Controller {
                 $entry->save();
 
                 ContractsBalanceHistory::create([
+                    'type' => 'entry',
+                    'type_relation' => $entry->id,
                     'contract_id' => $contract->id,
                     'start_balance' => $balanceSnapshot,
                     'amount' => floatval($entry->amount),
                     'end_balance' => $balanceSnapshot + floatval($entry->amount),
+                    'comment' => $entry->payment_purpose ?? null,
                 ]);
 
             }

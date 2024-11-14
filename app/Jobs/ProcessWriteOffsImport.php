@@ -102,8 +102,7 @@ class ProcessWriteOffsImport implements ShouldQueue
 
                     $contractQuery = Contract::where('status', 'Активный')
                         ->whereJsonContains('export_week_days', $dayOfWeek)
-                        ->whereRaw("title LIKE '% /BH %'")
-                        ->where('title', 'LIKE', '%BH ' . $row['zavod'] . ' %')
+                        ->where('shop', $row['zavod'])
                         ->where('retailer', 'Перекресток');
 
                     if ($contractQuery->exists()) {
@@ -114,6 +113,7 @@ class ProcessWriteOffsImport implements ShouldQueue
                         } else {
                             $contract = $contractQuery->first();
                             $status = 'find';
+                            $contract['id'] = $contract->id;
                             $contract['title'] = $contract->title;
                             $price = [
                                 'base' => (float) $contract->price,
@@ -134,13 +134,14 @@ class ProcessWriteOffsImport implements ShouldQueue
                             'store' => $row['naimenovanie_zavoda'],
                             'date' => $date,
                             'day_of_week' => $dayOfWeek,
-                            'total_weight' => $weight['total'],
                         ],
                         'create' => [
                             'status' => $status,
+                            'contract_id' => $contract['id'],
                             'contract' => $contract['title'],
                             'total_amount' => empty($price['total']) ? $price['base'] * $weight['total'] : $price['total'],
                             'retailer' => 'Перекресток',
+                            'total_weight' => $weight['total'],
                             'total_detail' => [
                                 'weight' => [
                                     'fruits' => floatval($weight['fruits']),
@@ -181,8 +182,14 @@ class ProcessWriteOffsImport implements ShouldQueue
             if ($this->supplierType == 'CROSSROAD') {
 
                 foreach ($importData as $value) {
-                    WriteOff::firstOrCreate($value['find'], $value['create']);
+                    $writeOff = WriteOff::firstOrCreate($value['find'], $value['create']);
+
+                    if ($writeOff->wasRecentlyCreated) {
+                        Log::channel('debug')->debug('FIND: ' . json_encode($value['find']) . ' | CREATE: ' . json_encode($value['create']));
+                    }
                 }
+
+                Log::channel('debug')->debug('Импорт завершен');
 
             }
 
@@ -217,13 +224,14 @@ class ProcessWriteOffsImport implements ShouldQueue
                 'store' => null,
                 'date' => null,
                 'day_of_week' => null,
-                'total_weight' => 0, // Сумма всех total_weight
             ],
             'create' => [
                 'status' => null,
+                'contract_id' => null,
                 'contract' => null,
                 'total_amount' => 0, // Сумма всех total_amount
                 'retailer' => null,
+                'total_weight' => 0, // Сумма всех total_weight
                 'total_detail' => [
                     'weight' => [
                         'fruits' => 0,
@@ -255,11 +263,12 @@ class ProcessWriteOffsImport implements ShouldQueue
             }
 
             // Суммируем total_weight
-            $merged['find']['total_weight'] += $item['find']['total_weight'];
+            $merged['create']['total_weight'] += $item['create']['total_weight'];
 
             // Поля create (также запоминаем только один раз)
             if (!$merged['create']['status']) {
                 $merged['create']['status'] = $item['create']['status'];
+                $merged['create']['contract_id'] = $item['create']['contract_id'];
                 $merged['create']['contract'] = $item['create']['contract'];
                 $merged['create']['retailer'] = $item['create']['retailer'];
             }

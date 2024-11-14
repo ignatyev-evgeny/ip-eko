@@ -23,7 +23,11 @@ class WriteOffsFindToPassedCommand extends Command {
 
             foreach ($writeOffs as $writeOff) {
 
-                $contract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($writeOff->contract) . "%")->first();
+                if(empty($writeOff->contract_id)) {
+                    continue;
+                }
+
+                $contract = Contract::find($writeOff->contract_id);
 
                 if(empty($contract)) {
                     continue;
@@ -37,10 +41,13 @@ class WriteOffsFindToPassedCommand extends Command {
                 $writeOff->save();
 
                 ContractsBalanceHistory::create([
+                    'type' => 'writeOff',
+                    'type_relation' => $writeOff->id,
                     'contract_id' => $contract->id,
                     'start_balance' => $balanceSnapshot,
                     'amount' => -$writeOff->total_amount,
                     'end_balance' => $balanceSnapshot - $writeOff->total_amount,
+                    'comment' => "Отгрузка / {$writeOff->date} / BH {$writeOff->store_number}",
                 ]);
 
             }

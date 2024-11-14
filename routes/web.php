@@ -20,6 +20,7 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
         Route::get('/detail/{entry}', [EntryController::class, 'detail'])->name('detail');
         Route::post('/store', [EntryController::class, 'store'])->name('store');
         Route::patch('/update/{entry}', [EntryController::class, 'update'])->name('update');
+        Route::patch('/transfer/{entry}', [EntryController::class, 'transfer'])->name('transfer');
         Route::delete('/delete', [EntryController::class, 'delete'])->name('delete');
         Route::patch('/passed', [EntryController::class, 'passed'])->name('passed');
         Route::patch('/ignore/{type}', [EntryController::class, 'ignore'])->name('ignore');
@@ -29,6 +30,7 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
         Route::get('/list', [WriteOffController::class, 'list'])->name('list');
         Route::get('/data', [WriteOffController::class, 'data'])->name('data');
         Route::get('/detail/{writeoff}', [WriteOffController::class, 'detail'])->name('detail');
+        Route::patch('/transfer/{writeoff}', [WriteOffController::class, 'transfer'])->name('transfer');
         Route::post('/store', [WriteOffController::class, 'store'])->name('store');
         Route::post('/upload', [WriteOffController::class, 'upload'])->name('upload');
         Route::patch('/update/{writeoff}', [WriteOffController::class, 'update'])->name('update');

@@ -173,13 +173,17 @@ class WriteOffController extends Controller {
             ->addColumn('total_amount', function($row) {
                 return number_format($row->total_amount, 2, '.', ' ').' ₽';
             })
+
             ->addColumn('total_weight', function($row) {
-                $return = number_format($row->total_weight, 2, '.', ' ').' кг.<br>';
+                $return = number_format($row->total_weight, 2, '.', ' ') . ' кг.<br>';
                 $return .= $row->total_amount > 0 ? '≈'.number_format($row->total_amount / $row->total_weight, 2, '.', ' ')." ₽" : number_format(0, 2, '.', ' ')." ₽";
                 return $return;
             })
+
             ->addColumn('actions', function($row) {
-                return '<button data-write-off-id="'.$row->id.'" type="button" class="btn btn-warning m-0 text-start changeRow"><i class="fa-solid fa-pen-to-square"></i></button>';
+                $buttons = '<button data-write-off-id="'.$row->id.'" type="button" class="btn btn-warning m-0 text-start changeRow"><i class="fa-solid fa-pen-to-square"></i></button>';
+                $buttons .= '<button data-write-off-id="'.$row->id.'" type="button" class="btn btn-primary m-1 text-start viewRow"><i class="fas fa-eye"></i></button>';
+                return $buttons;
             })
             ->rawColumns(['actions', 'date', 'store', 'contract', 'total_weight'])
             ->make(true);
@@ -337,6 +341,68 @@ class WriteOffController extends Controller {
         ], 201);
     }
 
+    public function transfer(WriteOff $writeoff, Request $request) {
+
+        if(empty($request->newContract)) {
+            return response()->json([
+                'message' => 'Невозможно перенести списание, если новый договор не заполнен',
+            ], 404);
+        }
+
+        if(empty($request->contract)) {
+            return response()->json([
+                'message' => 'Невозможно перенести списание, если договор не заполнен',
+            ], 404);
+        }
+
+        $contract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($request->contract) . "%")->first();
+        $newContract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($request->newContract) . "%")->first();
+
+        if(empty($newContract)) {
+            return response()->json([
+                'message' => 'Невозможно перенести списание, введенный договор не найден на стороне приложения',
+            ], 404);
+        }
+
+        if(empty($contract)) {
+            return response()->json([
+                'message' => 'Невозможно перенести списание, введенный указанный договор не найден на стороне приложения',
+            ], 404);
+        }
+
+        $contractBalanceSnapshot = $contract->local_balance;
+        $newContractBalanceSnapshot = $newContract->local_balance;
+
+        $contract->local_balance = $contract->local_balance - floatval($writeoff->total_amount);
+        $contract->save();
+
+        $newContract->local_balance = $newContract->local_balance + floatval($writeoff->total_amount);
+        $newContract->save();
+
+
+        ContractsBalanceHistory::create([
+            'contract_id' => $contract->id,
+            'start_balance' => $contractBalanceSnapshot,
+            'amount' => -floatval($writeoff->total_amount),
+            'end_balance' => $contractBalanceSnapshot - floatval($writeoff->total_amount),
+        ]);
+
+        ContractsBalanceHistory::create([
+            'contract_id' => $newContract->id,
+            'start_balance' => $newContractBalanceSnapshot,
+            'amount' => floatval($writeoff->total_amount),
+            'end_balance' => $newContractBalanceSnapshot + floatval($writeoff->total_amount),
+        ]);
+
+        $writeoff->contract = $newContract->title;
+        $writeoff->save();
+
+        return response()->json([
+            'message' => 'Списание успешно перенесено на другой договор',
+            'writeOff' => $writeoff,
+        ], 201);
+    }
+
     public function passed(Request $request) {
 
         if(empty($request['writeoffs'])) {
@@ -361,7 +427,7 @@ class WriteOffController extends Controller {
                     continue;
                 }
 
-                $contract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($entry->contract) . "%")->first();
+                $contract = Contract::where('shop', $entry->store_number)->first();
 
                 if(empty($contract)) {
                     continue;
@@ -375,10 +441,13 @@ class WriteOffController extends Controller {
                 $entry->save();
 
                 ContractsBalanceHistory::create([
+                    'type' => 'writeOff',
+                    'type_relation' => $entry->id,
                     'contract_id' => $contract->id,
                     'start_balance' => $balanceSnapshot,
                     'amount' => -$entry->total_amount,
                     'end_balance' => $balanceSnapshot - $entry->total_amount,
+                    'comment' => "Отгрузка / {$entry->date} / BH {$entry->store_number}",
                 ]);
             }
 

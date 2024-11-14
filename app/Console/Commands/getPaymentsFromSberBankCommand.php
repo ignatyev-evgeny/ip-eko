@@ -85,7 +85,9 @@ class getPaymentsFromSberBankCommand extends Command {
             });
 
             $filteredEntries = array_map(function($entry) {
-                preg_match('/(?<=№)\d+(?=\/)/', $entry['payment_purpose'], $matches);
+                //preg_match('/(?<=№)\d+(?=\/)/', $entry['payment_purpose'], $matches);
+                //preg_match('/\d+(?=\/)/', $entry['payment_purpose'], $matches);
+                preg_match('/(?<=\/)\d+(?=\/)/', $entry['payment_purpose'], $matches);
                 if (!empty($matches)) {
                     //$contract = Contract::where('number', $matches[0])->where('status', 'Активный')->first();
                     $contract = Contract::where('number', $matches[0])->first();
