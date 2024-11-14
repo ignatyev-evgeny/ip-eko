@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Models\Contract;
 use App\Models\ContractsBalanceHistory;
 use App\Models\Entry;
-use App\Models\WriteOff;
 use DB;
 use Exception;
 use Illuminate\Console\Command;
@@ -38,10 +37,13 @@ class EntriesFindToPassedCommand extends Command {
                 $entry->save();
 
                 ContractsBalanceHistory::create([
+                    'type' => 'entry',
+                    'type_relation' => $entry->id,
                     'contract_id' => $contract->id,
                     'start_balance' => $balanceSnapshot,
                     'amount' => $entry->amount,
                     'end_balance' => $balanceSnapshot + $entry->amount,
+                    'comment' => $entry->payment_purpose ?? null,
                 ]);
 
             }
