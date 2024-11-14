@@ -368,16 +368,16 @@
                     topStart: {
                         buttons: [
                             {
-                                text: 'Выбрать все',
+                                text: 'Выделение',
                                 action: function (e, dt, button, config) {
                                     var allSelected = table.rows({ page: 'current' }).nodes().to$().hasClass('selected');
 
                                     if (allSelected) {
                                         table.rows({ page: 'current' }).deselect();
-                                        button.text('Выбрать все');
+                                        button.text('Выделение');
                                     } else {
                                         table.rows({ page: 'current' }).select();
-                                        button.text('Снять выделение');
+                                        button.text('Выделение');
                                     }
                                 }
                             },
@@ -801,6 +801,7 @@
 
 
             $('#confirmDelete').click(function() {
+                $(this).prop('disabled', true);
                 var selectedRows = table.rows({ selected: true }).data();
                 var entries = $.map(selectedRows, function(row) {
                     return row.id;
@@ -815,15 +816,19 @@
                     success: function(response) {
                         table.rows({ selected: true }).remove().draw();
                         $('#confirmModal').modal('hide');
+                        $('#confirmDelete').prop('disabled', false);
                     },
                     error: function(xhr) {
                         $('#confirmModal').modal('hide');
                         toastr.error(xhr.responseJSON.message);
+                        $('#confirmDelete').prop('disabled', false);
                     }
                 });
+
             });
 
             $('#confirmPassed').click(function() {
+                $(this).prop('disabled', true);
                 var selectedRows = table.rows({ selected: true }).data();
                 var entries = $.map(selectedRows, function(row) {
                     return row.id;
@@ -838,15 +843,18 @@
                     success: function(response) {
                         table.ajax.reload();
                         $('#confirmPassedModal').modal('hide');
+                        $('#confirmPassed').prop('disabled', false);
                     },
                     error: function(xhr) {
                         $('#confirmPassedModal').modal('hide');
                         toastr.error(xhr.responseJSON.message);
+                        $('#confirmPassed').prop('disabled', false);
                     }
                 });
             });
 
             $('#confirmIgnore').click(function() {
+                $(this).prop('disabled', true);
                 var selectedRows = table.rows({ selected: true }).data();
                 var entries = $.map(selectedRows, function(row) {
                     return row.id;
@@ -861,12 +869,15 @@
                     success: function(response) {
                         table.ajax.reload();
                         $('#confirmIgnoreModal').modal('hide');
+                        $('#confirmIgnore').prop('disabled', false);
                     },
                     error: function(xhr) {
                         $('#confirmIgnoreModal').modal('hide');
                         toastr.error(xhr.responseJSON.message);
+                        $('#confirmIgnore').prop('disabled', false);
                     }
                 });
+
             });
 
             $.ui.autocomplete.prototype._renderMenu = function(ul, items) {

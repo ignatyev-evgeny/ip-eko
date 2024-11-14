@@ -11,130 +11,14 @@ use Carbon\Carbon;
 use DB;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class WriteOffController extends Controller {
+
     public function list(Request $request) {
-
-        if($request->dd == "true") {
-
-            $rows = json_decode('[{"data_provodki":"8/26/2024","dokument_materiala":5984603941,"finansovyi_god":2024,"zakaza_na_otgr":4230377149,"zavod":2910,"naimenovanie_zavoda":"Никулинская 21","podriadcik":80220165,"naimenovanie_podriadcika":"ИП Кучаев Дмитрий Николаевич","material":50000070,"naimenovanie_materiala":"Пищевой отход","kolicestvo":21.5,"bazisnaia_ei":"КГ","vid_dvizeniia":161,"transportnaia_nakladnaia":4230377149,"tekst_zagolovka_dokumenta":"GK/2910","data_vvoda_dok_ta":"8/26/2024","vremia_vvoda":"7:58:21 PM","avtor_dok_ta":"BJOB_FI_ER2","tip_korrektirovki":null,"edi":null,"tabelnyi_nomer":0,"podtverzden_cov":null,"fio":null,"nomer_telefona":null,"nomer_ts":null},{"data_provodki":"8/26/2024","dokument_materiala":5984603941,"finansovyi_god":2024,"zakaza_na_otgr":4230377149,"zavod":2910,"naimenovanie_zavoda":"Никулинская 21","podriadcik":80220165,"naimenovanie_podriadcika":"ИП Кучаев Дмитрий Николаевич","material":50000063,"naimenovanie_materiala":"Молочная гастрономия","kolicestvo":12,"bazisnaia_ei":"КГ","vid_dvizeniia":161,"transportnaia_nakladnaia":4230377149,"tekst_zagolovka_dokumenta":"GK/2910","data_vvoda_dok_ta":"8/26/2024","vremia_vvoda":"7:58:21 PM","avtor_dok_ta":"BJOB_FI_ER2","tip_korrektirovki":null,"edi":null,"tabelnyi_nomer":0,"podtverzden_cov":null,"fio":null,"nomer_telefona":null,"nomer_ts":null},{"data_provodki":"8/26/2024","dokument_materiala":5984568499,"finansovyi_god":2024,"zakaza_na_otgr":4230386180,"zavod":"B051","naimenovanie_zavoda":"Подольск, Юбилейная","podriadcik":80220165,"naimenovanie_podriadcika":"ИП Кучаев Дмитрий Николаевич","material":50000063,"naimenovanie_materiala":"Молочная гастрономия","kolicestvo":12,"bazisnaia_ei":"КГ","vid_dvizeniia":161,"transportnaia_nakladnaia":4230386180,"tekst_zagolovka_dokumenta":"GK/B051","data_vvoda_dok_ta":"8/26/2024","vremia_vvoda":"5:00:53 PM","avtor_dok_ta":"BJOB_FI_ER2","tip_korrektirovki":null,"edi":null,"tabelnyi_nomer":0,"podtverzden_cov":null,"fio":null,"nomer_telefona":null,"nomer_ts":null}]', true);
-
-            foreach ($rows as $row) {
-
-                $price['total'] = $price['base'] = 0.0;
-                $contract['title'] = null;
-                $status = 'new';
-
-                $weight['fruits'] = match ($row['material']) {
-                    50000066 => $row['kolicestvo'],
-                    default => null
-                };
-
-                $weight['bread'] = match ($row['material']) {
-                    50000069 => $row['kolicestvo'],
-                    default => null
-                };
-
-                $weight['milk'] = match ($row['material']) {
-                    50000063 => $row['kolicestvo'],
-                    default => null
-                };
-
-                $weight['used_oil'] = match ($row['material']) {
-                    50000094 => $row['kolicestvo'],
-                    default => null
-                };
-
-                $weight['other'] = match ($row['material']) {
-                    50000070 => $row['kolicestvo'],
-                    default => null
-                };
-
-
-                $weight['total'] = $weight['fruits'] + $weight['bread'] + $weight['milk'] + $weight['other'] + $weight['used_oil'];
-
-                $date = Carbon::createFromFormat('m/d/Y', $row['data_provodki'])->format('Y-m-d'); // Ваша дата в формате Y-m-d
-                Carbon::setLocale('ru');
-                $carbonDate = Carbon::createFromFormat('Y-m-d', $date);
-                $dayOfWeek = mb_ucfirst($carbonDate->translatedFormat('l'));
-
-                $contractQuery = Contract::where('status', 'Активный')
-                    ->whereJsonContains('export_week_days', $dayOfWeek)
-                    ->whereRaw("title LIKE '% / %'")
-                    ->where('title', 'LIKE', '%' . $row['zavod'] . '%')
-                    ->where('retailer', 'Перекресток');
-
-                if ($contractQuery->exists()) {
-                    $contractCount = $contractQuery->count();
-
-                    if ($contractCount > 1) {
-                        $status = 'moreOneContract';
-                    } else {
-                        $contract = $contractQuery->first();
-                        $status = 'find';
-                        $contract['title'] = $contract->title;
-                        $price = [
-                            'base' => (float) $contract->price,
-                            'fruits' => $weight['fruits'] * (float) $contract->price_fruits_vegetables,
-                            'bread' => $weight['bread'] * (float) $contract->price_bakery,
-                            'milk' => $weight['milk'] * (float) $contract->price_dairy,
-                            'used_oil' => $weight['used_oil'] * (float) $contract->price_used_oil,
-                            'other' => $weight['other'] * (float) $contract->price_other,
-                        ];
-                        $price['total'] = $price['fruits'] + $price['bread'] + $price['milk'] + $price['other'];
-                    }
-                }
-
-                $data[$row['dokument_materiala']][] = [
-                    'find' => [
-                        'external' => $row['dokument_materiala'],
-                        'store_number' => $row['zavod'],
-                        'store' => $row['naimenovanie_zavoda'],
-                        'date' => $date,
-                        'day_of_week' => $dayOfWeek,
-                        'total_weight' => $weight['total'],
-                    ],
-                    'create' => [
-                        'status' => $status,
-                        'contract' => $contract['title'],
-                        'total_amount' => empty($price['total']) ? $price['base'] * $weight['total'] : $price['total'],
-                        'retailer' => 'Перекресток',
-                        'total_detail' => [
-                            'weight' => [
-                                'fruits' => $weight['fruits'],
-                                'bread' => $weight['bread'],
-                                'milk' => $weight['milk'],
-                                'used_oil' => $weight['used_oil'],
-                                'other' => $weight['other'],
-                            ],
-                            'price' => [
-                                'base' => $price['base'],
-                                'fruits' => $price['fruits'],
-                                'bread' => $price['bread'],
-                                'milk' => $price['milk'],
-                                'used_oil' => $price['used_oil'],
-                                'other' => $price['other'],
-                            ]
-                        ],
-                    ]
-
-                ];
-
-
-            }
-
-            foreach ($this->mergeIfMultiple($data) as $value) {
-                dump($value);
-            }
-
-            dd($data, $this->mergeIfMultiple($data));
-        }
-
         return view('writeOff.index', [
             'writeOffs' => WriteOff::all(),
             'iframe' => $request->server()['HTTP_SEC_FETCH_DEST'] == 'iframe',
@@ -143,12 +27,12 @@ class WriteOffController extends Controller {
 
     public function data()
     {
-        $writeOffs = WriteOff::select(['id', 'status', 'comment', 'external', 'store_number', 'store', 'date', 'day_of_week', 'total_weight', 'total_amount', 'counteragent', 'contract', 'retailer']);
+        $writeOffs = WriteOff::select(['id', 'status', 'comment', 'external', 'store_number', 'store', 'date', 'day_of_week', 'total_weight', 'total_amount', 'counteragent', 'contract_id', 'contract', 'retailer']);
 
         return DataTables::of($writeOffs)
-            ->addColumn('status', function($row) {
 
-                $status = match ($row->status) {
+            ->addColumn('status', function($row) {
+                return match ($row->status) {
                     'new' => 'Новое',
                     'duplicate' => 'Дубликат',
                     'passed' => 'Проведено',
@@ -158,18 +42,20 @@ class WriteOffController extends Controller {
                     'find' => 'Найден',
                     default => $row->status
                 };
-
-                return $status;
             })
+
             ->addColumn('date', function($row) {
                 return Carbon::parse($row->date)->format('Y-m-d').'<br>'.$row->day_of_week;
             })
+
             ->addColumn('contract', function($row) {
-                return '<a target="_blank" href="/contract/list?search=' . $row->contract . '">' . $row->contract . '</a>';
+                return '<a target="_blank" href="/contract/list?numberFilter=' . $row->contractDetail->number . '">' . $row->contract . '</a>';
             })
+
             ->addColumn('store', function($row) {
-                return '<a target="_blank" href="/contract/list?search=' . $row->store_number . '">' . $row->store_number . '</a><br>'.$row->store;
+                return '<a target="_blank" href="/contract/list?shopFilter=' . $row->store_number . '">' . $row->store_number . '</a><br>'.$row->store;
             })
+
             ->addColumn('total_amount', function($row) {
                 return number_format($row->total_amount, 2, '.', ' ').' ₽';
             })
@@ -181,11 +67,21 @@ class WriteOffController extends Controller {
             })
 
             ->addColumn('actions', function($row) {
-                $buttons = '<button data-write-off-id="'.$row->id.'" type="button" class="btn btn-warning m-0 text-start changeRow"><i class="fa-solid fa-pen-to-square"></i></button>';
-                $buttons .= '<button data-write-off-id="'.$row->id.'" type="button" class="btn btn-primary m-1 text-start viewRow"><i class="fas fa-eye"></i></button>';
+
+                $buttons = '';
+
+                if($row->status != 'passed') {
+                    $buttons .= '<button data-write-off-id="'.$row->id.'" type="button" class="btn btn-warning m-0 text-start changeRow"><i class="fa-solid fa-pen-to-square"></i></button>';
+                }
+
+                if($row->status == 'passed') {
+                    $buttons .= '<button data-write-off-id="'.$row->id.'" type="button" class="btn btn-primary m-1 text-start viewRow"><i class="fas fa-eye"></i></button>';
+                }
                 return $buttons;
             })
+
             ->rawColumns(['actions', 'date', 'store', 'contract', 'total_weight'])
+
             ->make(true);
     }
 
@@ -194,75 +90,60 @@ class WriteOffController extends Controller {
         $response = $writeoff->toArray();
         $response['date'] = Carbon::parse($writeoff->date)->format('Y-m-d');
 
+        if(!empty($writeoff->contract_id)) {
+            $contract = Contract::find($writeoff->contract_id);
+        }
+
+        $response['price'] = $contract->price ?? 0;
+
         return response()->json([
             'message' => 'Данные успешно получены!',
             'writeOff' => $response,
         ]);
     }
 
-    public function store(WriteOffRequest $request) {
+    public function store(WriteOffRequest $request)
+    {
+
         $data = $request->validated();
 
-        $data['total_detail'] = [
-            'fruits_amount' => $data['fruits_amount'] ?? 0,
-            'fruits_weight' => $data['fruits_weight'] ?? 0,
-            'bread_amount' => $data['bread_amount'] ?? 0,
-            'bread_weight' => $data['bread_weight'] ?? 0,
-            'milk_amount' => $data['milk_amount'] ?? 0,
-            'milk_weight' => $data['milk_weight'] ?? 0,
-            'food_waste_amount' => $data['food_waste_amount'] ?? 0,
-            'food_waste_weight' => $data['food_waste_weight'] ?? 0,
-            'used_vegetable_oil_amount' => $data['used_vegetable_oil_amount'] ?? 0,
-            'used_vegetable_oil_weight' => $data['used_vegetable_oil_weight'] ?? 0,
-            'groceries_amount' => $data['groceries_amount'] ?? 0,
-            'groceries_weight' => $data['groceries_weight'] ?? 0,
-            'other_amount' => $data['other_amount'] ?? 0,
-            'other_weight' => $data['other_weight'] ?? 0,
-        ];
+        if(!empty($data['contract'])) {
 
-        if(empty($data['total_weight'])) {
-            $data['total_weight'] = $data['total_detail']['fruits_weight'] + $data['total_detail']['bread_weight'] + $data['total_detail']['milk_weight'] + $data['total_detail']['food_waste_weight'] + $data['total_detail']['used_vegetable_oil_weight'] + $data['total_detail']['groceries_weight'] + $data['total_detail']['other_weight'];
-            $data['total_amount'] = $data['total_detail']['fruits_amount'] + $data['total_detail']['bread_amount'] + $data['total_detail']['milk_amount'] + $data['total_detail']['food_waste_amount'] + $data['total_detail']['used_vegetable_oil_amount'] + $data['total_detail']['groceries_amount'] + $data['total_detail']['other_amount'];
+            $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($data['contract']))->first();
+
+            if(empty($contract)) {
+                return response()->json([
+                    'message' => "Указанный договор - {$data['contract']} не найден.",
+                ], 404);
+            }
+
+            $data['contract_id'] = $contract->id;
         }
 
-        $writeoff = WriteOff::create($data);
-        return response()->json([
-            'message' => 'Данные успешно сохранены!',
-            'writeoff' => $writeoff,
-        ], 201);
-    }
+        if(!empty($data['detail_view']) && $data['detail_view'] == 'on') {
 
-    public function update(WriteOff $writeoff, WriteOffRequest $request) {
-        $data = $request->validated();
+            $data['total_detail'] = [
+                'price' => [
+                    'base' => $data['price'] ?? 0,
+                    'fruits' => $data['fruits_price'] ?? 0,
+                    'bread' => $data['bread_price'] ?? 0,
+                    'milk' => $data['milk_price'] ?? 0,
+                    'food_waste' => $data['food_waste_price'] ?? 0,
+                    'used_vegetable_oil' => $data['used_vegetable_oil_price'] ?? 0,
+                    'groceries' => $data['groceries_price'] ?? 0,
+                    'other' => $data['other_price'] ?? 0
+                ],
+                'weight' => [
+                    'fruits' => $data['fruits_weight'] ?? 0,
+                    'bread' => $data['bread_weight'] ?? 0,
+                    'milk' => $data['milk_weight'] ?? 0,
+                    'food_waste' => $data['food_waste_weight'] ?? 0,
+                    'used_vegetable_oil' => $data['used_vegetable_oil_weight'] ?? 0,
+                    'groceries' => $data['groceries_weight'] ?? 0,
+                    'other' => $data['other_weight'] ?? 0,
+                ]
+            ];
 
-        if($writeoff->status == 'passed') {
-            return response()->json([
-                'message' => 'Запрещено редактировать уже проведенное списание',
-            ], 403);
-        }
-
-        $data['total_detail'] = [
-            'weight' => [
-                'fruits' => $data['fruits_weight'] ? (float) $data['fruits_weight'] : 0.0,
-                'bread' => $data['bread_weight'] ? (float) $data['bread_weight'] : 0.0,
-                'milk' => $data['milk_weight'] ? (float) $data['milk_weight'] : 0.0,
-                'food_waste' => $data['food_waste_weight'] ? (float) $data['milk_weight'] : 0.0,
-                'used_vegetable_oil' => $data['used_vegetable_oil_weight'] ? (float) $data['used_vegetable_oil_weight'] : 0.0,
-                'groceries' => $data['groceries_weight'] ? (float) $data['groceries_weight'] : 0.0,
-                'other' => $data['other_weight'] ? (float) $data['other_weight'] : 0.0,
-            ],
-            'price' => [
-                'fruits' => !empty($data['fruits_price']) ? (float) $data['fruits_price'] : 0.0,
-                'bread' =>  !empty($data['bread_price']) ? (float) $data['bread_price'] : 0.0,
-                'milk' => !empty($data['milk_price']) ? (float) $data['milk_price'] : 0.0,
-                'food_waste' => !empty($data['food_waste_price']) ? (float) $data['food_waste_price'] : 0.0,
-                'used_vegetable_oil' => !empty($data['used_vegetable_oil_price']) ? (float) $data['used_vegetable_oil_price'] : 0.0,
-                'groceries' => !empty($data['groceries_price']) ? (float) $data['groceries_price'] : 0.0,
-                'other' => !empty($data['other_price']) ? (float) $data['other_price'] : 0.0,
-            ],
-        ];
-
-        if(empty($data['total_weight'])) {
             $data['total_weight'] = array_sum([
                 $data['total_detail']['weight']['fruits'],
                 $data['total_detail']['weight']['bread'],
@@ -272,9 +153,6 @@ class WriteOffController extends Controller {
                 $data['total_detail']['weight']['groceries'],
                 $data['total_detail']['weight']['other'],
             ]);
-        }
-
-        if(!empty($data['detail_view']) && $data['detail_view'] == "on" && empty($data['take_contract'])) {
 
             $data['total_amount'] = array_sum([
                 $data['total_detail']['weight']['fruits'] * $data['total_detail']['price']['fruits'],
@@ -288,32 +166,75 @@ class WriteOffController extends Controller {
 
         }
 
-        if(!empty($data['take_contract']) && $data['take_contract'] == "on") {
+        $writeoff = WriteOff::create($data);
 
-            $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($data['contract']))->first();
+        return response()->json([
+            'message' => 'Данные успешно сохранены!',
+            'writeoff' => $writeoff,
+        ], 201);
 
-            if(empty($contract)) {
-                return response()->json([
-                    'message' => 'Договор не найден.',
-                ], 400);
-            }
+    }
 
-            if(empty($contract->price)) {
-                return response()->json([
-                    'message' => 'В договоре не указана базовая стоимость.',
-                ], 400);
-            }
+    public function update(WriteOff $writeoff, WriteOffRequest $request)
+    {
 
-            $data['total_detail']['price'] = [
-                'fruits' => $contract->price_fruits_vegetables ?? 0.0,
-                'bread' =>  $contract->price_bakery ?? 0.0,
-                'milk' => $contract->price_dairy ?? 0.0,
-                'food_waste' => $contract->price_waste ?? 0.0,
-                'used_vegetable_oil' => $contract->price_used_oil ?? 0.0,
-                'groceries' => $contract->price_grocery ?? 0.0,
-                'other' => $contract->other ?? 0.0,
+        $data = $request->validated();
+
+        if($writeoff->status == 'passed') {
+            return response()->json([
+                'message' => 'Запрещено редактировать уже проведенное списание',
+            ], 403);
+        }
+
+        if(empty($data['contract'])) {
+            return response()->json([
+                'message' => 'Договор является обязательным для заполнения',
+            ], 404);
+        }
+
+        $contract = Contract::where('title', "like", getTextAfterFirstDashIfMatched($data['contract']))->first();
+
+        if(empty($contract)) {
+            return response()->json([
+                'message' => "Договор - {$data['contract']} - не найден",
+            ], 404);
+        }
+
+        $data['contract_id'] = $contract->id;
+
+        if(!empty($data['detail_view']) && $data['detail_view'] == "on") {
+
+            $data['total_detail'] = [
+                'weight' => [
+                    'fruits' => $data['fruits_weight'] ? (float) $data['fruits_weight'] : 0.0,
+                    'bread' => $data['bread_weight'] ? (float) $data['bread_weight'] : 0.0,
+                    'milk' => $data['milk_weight'] ? (float) $data['milk_weight'] : 0.0,
+                    'food_waste' => $data['food_waste_weight'] ? (float) $data['milk_weight'] : 0.0,
+                    'used_vegetable_oil' => $data['used_vegetable_oil_weight'] ? (float) $data['used_vegetable_oil_weight'] : 0.0,
+                    'groceries' => $data['groceries_weight'] ? (float) $data['groceries_weight'] : 0.0,
+                    'other' => $data['other_weight'] ? (float) $data['other_weight'] : 0.0,
+                ],
+                'price' => [
+                    'fruits' => !empty($data['fruits_price']) ? (float) $data['fruits_price'] : 0.0,
+                    'bread' =>  !empty($data['bread_price']) ? (float) $data['bread_price'] : 0.0,
+                    'milk' => !empty($data['milk_price']) ? (float) $data['milk_price'] : 0.0,
+                    'food_waste' => !empty($data['food_waste_price']) ? (float) $data['food_waste_price'] : 0.0,
+                    'used_vegetable_oil' => !empty($data['used_vegetable_oil_price']) ? (float) $data['used_vegetable_oil_price'] : 0.0,
+                    'groceries' => !empty($data['groceries_price']) ? (float) $data['groceries_price'] : 0.0,
+                    'other' => !empty($data['other_price']) ? (float) $data['other_price'] : 0.0,
+                ],
             ];
 
+            $data['total_weight'] = array_sum([
+                $data['total_detail']['weight']['fruits'],
+                $data['total_detail']['weight']['bread'],
+                $data['total_detail']['weight']['milk'],
+                $data['total_detail']['weight']['food_waste'],
+                $data['total_detail']['weight']['used_vegetable_oil'],
+                $data['total_detail']['weight']['groceries'],
+                $data['total_detail']['weight']['other'],
+            ]);
+
             $data['total_amount'] = array_sum([
                 $data['total_detail']['weight']['fruits'] * $data['total_detail']['price']['fruits'],
                 $data['total_detail']['weight']['bread'] * $data['total_detail']['price']['bread'],
@@ -324,15 +245,9 @@ class WriteOffController extends Controller {
                 $data['total_detail']['weight']['other'] * $data['total_detail']['price']['other'],
             ]);
 
-            $data['status'] = 'find';
-
-            $data['total_amount'] = empty($data['total_amount']) ? (float) $data['total_weight'] * (float) $contract->price : $data['total_amount'];
         }
 
-        $data['total_weight'] = empty($data['total_weight']) ? 0.0 : $data['total_weight'];
-        $data['total_amount'] = empty($data['total_amount']) ? 0.0 : $data['total_amount'];
-
-
+        $data['status'] = 'find';
         $writeoff->update($data);
 
         return response()->json([
@@ -342,6 +257,12 @@ class WriteOffController extends Controller {
     }
 
     public function transfer(WriteOff $writeoff, Request $request) {
+
+        if($writeoff->status != 'passed') {
+            return response()->json([
+                'message' => 'Изменять договор в списании можно только на проведенном списании',
+            ], 404);
+        }
 
         if(empty($request->newContract)) {
             return response()->json([
@@ -381,17 +302,23 @@ class WriteOffController extends Controller {
 
 
         ContractsBalanceHistory::create([
+            'type' => 'transfer',
+            'type_relation' => $contract->id,
             'contract_id' => $contract->id,
             'start_balance' => $contractBalanceSnapshot,
             'amount' => -floatval($writeoff->total_amount),
             'end_balance' => $contractBalanceSnapshot - floatval($writeoff->total_amount),
+            'comment' => "Перенос с договора {$contract->title} на договор {$newContract->title}",
         ]);
 
         ContractsBalanceHistory::create([
+            'type' => 'transfer',
+            'type_relation' => $newContract->id,
             'contract_id' => $newContract->id,
             'start_balance' => $newContractBalanceSnapshot,
             'amount' => floatval($writeoff->total_amount),
             'end_balance' => $newContractBalanceSnapshot + floatval($writeoff->total_amount),
+            'comment' => "Перенос с договора {$contract->title} на договор {$newContract->title}",
         ]);
 
         $writeoff->contract = $newContract->title;
@@ -415,39 +342,43 @@ class WriteOffController extends Controller {
 
         try {
 
-            foreach ($request['writeoffs'] as $entry) {
+            foreach ($request['writeoffs'] as $writeoff) {
 
-                $entry = WriteOff::where('id', $entry)->first();
+                $writeoff = WriteOff::find($writeoff);
 
-                if($entry->status == 'passed') {
+                if($writeoff->total_amount <= 0) {
                     continue;
                 }
 
-                if(empty($entry->contract)) {
+                if($writeoff->status == 'passed') {
                     continue;
                 }
 
-                $contract = Contract::where('shop', $entry->store_number)->first();
+                if(empty($writeoff->contract_id)) {
+                    continue;
+                }
+
+                $contract = Contract::find($writeoff->contract_id);
 
                 if(empty($contract)) {
                     continue;
                 }
 
                 $balanceSnapshot = $contract->local_balance;
-                $contract->local_balance = $contract->local_balance - $entry->total_amount;
+                $contract->local_balance = $contract->local_balance - $writeoff->total_amount;
                 $contract->save();
 
-                $entry->status = 'passed';
-                $entry->save();
+                $writeoff->status = 'passed';
+                $writeoff->save();
 
                 ContractsBalanceHistory::create([
                     'type' => 'writeOff',
-                    'type_relation' => $entry->id,
+                    'type_relation' => $writeoff->id,
                     'contract_id' => $contract->id,
                     'start_balance' => $balanceSnapshot,
-                    'amount' => -$entry->total_amount,
-                    'end_balance' => $balanceSnapshot - $entry->total_amount,
-                    'comment' => "Отгрузка / {$entry->date} / BH {$entry->store_number}",
+                    'amount' => -$writeoff->total_amount,
+                    'end_balance' => $balanceSnapshot - $writeoff->total_amount,
+                    'comment' => "Отгрузка / {$writeoff->date} / BH {$writeoff->store_number}",
                 ]);
             }
 
@@ -480,37 +411,37 @@ class WriteOffController extends Controller {
 
         try {
 
-            foreach ($request['writeoffs'] as $entry) {
+            foreach ($request['writeoffs'] as $writeoff) {
 
-                $entry = WriteOff::where('id', $entry)->first();
+                $writeoff = WriteOff::find($writeoff);
 
-                if($entry->status == 'passed') {
+                if($writeoff->status == 'passed') {
 
-                    if(empty($entry->contract)) {
+                    if(empty($writeoff->contract_id)) {
                         continue;
                     }
 
-                    $contract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($entry->contract) . "%")->first();
+                    $contract = Contract::find($writeoff->contract_id);
 
                     if(empty($contract)) {
                         continue;
                     }
 
                     $balanceSnapshot = $contract->local_balance;
-                    $contract->local_balance = $contract->local_balance + $entry->total_amount;
+                    $contract->local_balance = $contract->local_balance + $writeoff->total_amount;
                     $contract->save();
 
                     ContractsBalanceHistory::create([
                         'contract_id' => $contract->id,
                         'start_balance' => $balanceSnapshot,
-                        'amount' => $entry->total_amount,
-                        'end_balance' => $balanceSnapshot + $entry->total_amount,
+                        'amount' => $writeoff->total_amount,
+                        'end_balance' => $balanceSnapshot + $writeoff->total_amount,
                     ]);
 
                 }
 
-                $entry->status = 'free';
-                $entry->save();
+                $writeoff->status = 'free';
+                $writeoff->save();
 
             }
 
@@ -543,37 +474,37 @@ class WriteOffController extends Controller {
 
         try {
 
-            foreach ($request['writeoffs'] as $entry) {
+            foreach ($request['writeoffs'] as $writeoff) {
 
-                $entry = WriteOff::where('id', $entry)->first();
+                $writeoff = WriteOff::find($writeoff);
 
-                if($entry->status == 'passed') {
+                if($writeoff->status == 'passed') {
 
-                    if(empty($entry->contract)) {
+                    if(empty($writeoff->contract_id)) {
                         continue;
                     }
 
-                    $contract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($entry->contract) . "%")->first();
+                    $contract = Contract::find($writeoff->contract_id);
 
                     if(empty($contract)) {
                         continue;
                     }
 
-                    $contract->local_balance = $contract->local_balance + $entry->total_amount;
+                    $contract->local_balance = $contract->local_balance + $writeoff->total_amount;
                     $contract->save();
 
                     $balanceSnapshot = $contract->local_balance;
                     ContractsBalanceHistory::create([
                         'contract_id' => $contract->id,
                         'start_balance' => $balanceSnapshot,
-                        'amount' => $entry->total_amount,
-                        'end_balance' => $balanceSnapshot + $entry->total_amount,
+                        'amount' => $writeoff->total_amount,
+                        'end_balance' => $balanceSnapshot + $writeoff->total_amount,
                     ]);
 
                 }
 
-                $entry->status = 'canceled';
-                $entry->save();
+                $writeoff->status = 'canceled';
+                $writeoff->save();
 
             }
 
@@ -590,28 +521,6 @@ class WriteOffController extends Controller {
                 'message' => 'При проведении некоторых списаний, произошла ошибка!',
             ], 500);
         }
-    }
-
-    public function uploadOld(Request $request) {
-
-        $request->validate([
-            'supplierType' => 'required|string',
-            'file' => 'required|file|mimes:csv,txt'
-        ]);
-
-        $file = $request->file('file');
-
-        $supplierType = $request->input('supplierType');
-
-        Excel::import(new WriteOffsImport($supplierType), $file, null, \Maatwebsite\Excel\Excel::CSV, [
-            'delimiter' => ';',
-            'enclosure' => '"',
-            'escape_character' => '\\',
-        ]);
-
-        return response()->json([
-            'message' => 'Файл успешно поставлен в очередь на обработку.',
-        ], 201);
     }
 
     public function upload(Request $request)
@@ -669,12 +578,14 @@ class WriteOffController extends Controller {
     public function comment(Request $request, WriteOff $writeoff)
     {
         try {
+
             $writeoff->comment = $request->input('comment');
             $writeoff->save();
 
             return response()->json([
                 'message' => 'Комментарий успешно обновлен',
             ]);
+
         } catch (Exception $exception) {
             report($exception);
             return response()->json([
@@ -694,7 +605,7 @@ class WriteOffController extends Controller {
 
         foreach ($request['writeoffs'] as $writeoff) {
 
-            $writeoffDetail = WriteOff::where('id', $writeoff)->first();
+            $writeoffDetail = WriteOff::find($writeoff);
 
             if($writeoffDetail->status == 'passed') {
                 continue;

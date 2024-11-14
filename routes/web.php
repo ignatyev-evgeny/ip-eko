@@ -18,7 +18,6 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
         Route::get('/list/{type?}', [EntryController::class, 'list'])->name('list');
         Route::get('/data', [EntryController::class, 'data'])->name('data');
         Route::get('/detail/{entry}', [EntryController::class, 'detail'])->name('detail');
-        Route::post('/store', [EntryController::class, 'store'])->name('store');
         Route::patch('/update/{entry}', [EntryController::class, 'update'])->name('update');
         Route::patch('/transfer/{entry}', [EntryController::class, 'transfer'])->name('transfer');
         Route::delete('/delete', [EntryController::class, 'delete'])->name('delete');

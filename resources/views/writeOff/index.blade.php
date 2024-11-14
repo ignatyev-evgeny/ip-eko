@@ -96,8 +96,8 @@
                     <div class="row">
                         <div class="col-4">
                             <div class="mb-3">
-                                <label for="external" class="form-label">Номер магазина</label>
-                                <input type="text" class="form-control" name="external" id="external">
+                                <label for="storeNumber" class="form-label">Номер магазина</label>
+                                <input type="text" class="form-control" name="store_number" id="storeNumber">
                             </div>
                         </div>
                         <div class="col-4">
@@ -114,18 +114,18 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-3">
                             <div class="mb-3">
                                 <label for="date" class="form-label">Дата</label>
                                 <input type="date" name="date" class="form-control" id="date">
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <label for="total_weight" class="form-label">Отгружено</label>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="detailToggle">
+                                        <input class="form-check-input" type="checkbox" name="detail_view" id="detailToggle">
                                         <label class="form-check-label" for="detailToggle">Детальный вид</label>
                                     </div>
                                 </div>
@@ -136,11 +136,21 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
+                            <div class="mb-3">
+                                <label for="total_amount" class="form-label">Цена</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="price" id="price">
+                                    <span class="input-group-text">₽</span>
+                                    <span class="input-group-text">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
                             <div class="mb-3">
                                 <label for="total_amount" class="form-label">Сумма</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" name="total_amount" id="total_amount">
+                                    <input type="text" class="form-control" name="total_amount" id="total_amount" readonly>
                                     <span class="input-group-text">₽</span>
                                     <span class="input-group-text">0.00</span>
                                 </div>
@@ -317,10 +327,6 @@
                                     <div class="mb-3">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <label for="contract" class="form-label">Договор</label>
-                                            <div class="form-check form-switch" >
-                                                <input class="form-check-input" type="checkbox" name="take_contract" id="detailTakeContract" >
-                                                <label class="form-check-label" for="detailTakeContract">Учитывать договор</label>
-                                            </div>
                                         </div>
                                         <input type="text" class="form-control contractInput" name="contract" id="editContract" aria-describedby="contractInput">
                                     </div>
@@ -339,7 +345,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-6 ms-auto">
+                                <div class="col-4 ms-auto">
                                     <div class="mb-3">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <label for="total_weight" class="form-label">Отгружено</label>
@@ -355,11 +361,21 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-6 ms-auto">
+                                <div class="col-4 ms-auto">
+                                    <div class="mb-3">
+                                        <label for="total_weight" class="form-label">Цена</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="price" id="editPrice">
+                                            <span class="input-group-text">₽</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4 ms-auto">
                                     <div class="mb-3">
                                         <label for="total_weight" class="form-label">Сумма</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control" name="total_amount" id="editTotal_amount">
+                                            <input type="text" class="form-control" name="total_amount" id="editTotal_amount" readonly>
                                             <span class="input-group-text">₽</span>
                                             <span class="input-group-text">0.00</span>
                                         </div>
@@ -569,6 +585,63 @@
 
     $(document).ready( function () {
 
+        /** Функция для пересчета суммы */
+        function calculateTotalAmount() {
+            let weight = parseFloat($('#total_weight').val()) || 0;
+            let price = parseFloat($('#price').val()) || 0;
+            let totalAmount = weight * price;
+            $('#total_amount').val(totalAmount.toFixed(2));
+        }
+
+        /** Функция для пересчета суммы */
+        function calculateEditTotalAmount() {
+            let weight = parseFloat($('#editTotal_weight').val()) || 0;
+            let price = parseFloat($('#editPrice').val()) || 0;
+            let totalAmount = weight * price;
+            $('#editTotal_amount').val(totalAmount.toFixed(2));
+        }
+
+        function updateStatusButtons() {
+            let statusCounts = {};
+
+            table.rows().data().each(function(row) {
+                const status = row.status;
+                if (!statusCounts[status]) {
+                    statusCounts[status] = 0;
+                }
+                statusCounts[status]++;
+            });
+
+            let buttonsContainer = $('#status-filter-buttons');
+            buttonsContainer.empty();
+
+            for (let status in statusCounts) {
+                let buttonClass = 'btn btn-secondary';
+
+                if (status === 'Проведено') {
+                    buttonClass = 'btn btn-success';
+                }
+
+                buttonsContainer.append(`<button class="${buttonClass} status-filter me-2" data-status="${status}">${status} (${statusCounts[status]})</button>`);
+            }
+
+            $('.status-filter').on('click', function() {
+                const status = $(this).data('status');
+                table.column(2).search(status).draw();
+            });
+        }
+
+
+        /** Добавляем обработчики изменения для полей */
+        $('#total_weight, #price').on('input', function() {
+            calculateTotalAmount();
+        });
+
+        /** Добавляем обработчики изменения для полей */
+        $('#editTotal_weight, #editPrice').on('input', function() {
+            calculateEditTotalAmount();
+        });
+
         $('#min-date, #max-date').datepicker({
             dateFormat: 'yy-mm-dd',
             firstDay: 1, // Первый день недели — понедельник
@@ -587,6 +660,7 @@
             if ($(this).is(':checked')) {
 
                 $('#total_weight').attr('disabled', true);
+                $('#price').attr('disabled', true);
                 $('#total_amount').attr('disabled', true);
 
                 additionalFields.append(`
@@ -721,6 +795,7 @@
             `);
             } else {
                 $('#total_weight').attr('disabled', false);
+                $('#price').attr('disabled', false);
                 $('#total_amount').attr('disabled', false);
                 additionalFields.empty();
             }
@@ -730,11 +805,13 @@
             if ($(this).is(':checked')) {
 
                 $('#editTotal_weight').attr('disabled', true);
+                $('#editPrice').attr('disabled', true);
                 $('#editTotal_amount').attr('disabled', true);
                 $('.additionalEditFields').removeClass('d-none');
 
             } else {
                 $('#editTotal_weight').attr('disabled', false);
+                $('#editPrice').attr('disabled', false);
                 $('#editTotal_amount').attr('disabled', false);
                 $('.additionalEditFields').addClass('d-none');
             }
@@ -767,16 +844,16 @@
                 topStart: {
                     buttons: [
                         {
-                            text: 'Выбрать все',
+                            text: 'Выделение',
                             action: function (e, dt, button, config) {
                                 var allSelected = table.rows({ page: 'current' }).nodes().to$().hasClass('selected');
 
                                 if (allSelected) {
                                     table.rows({ page: 'current' }).deselect();
-                                    button.text('Выбрать все');
+                                    button.text('Выделение');
                                 } else {
                                     table.rows({ page: 'current' }).select();
-                                    button.text('Снять выделение');
+                                    button.text('Выделение');
                                 }
                             }
                         },
@@ -942,36 +1019,6 @@
 
         });
 
-        function updateStatusButtons() {
-            let statusCounts = {};
-
-            table.rows().data().each(function(row) {
-                const status = row.status;
-                if (!statusCounts[status]) {
-                    statusCounts[status] = 0;
-                }
-                statusCounts[status]++;
-            });
-
-            let buttonsContainer = $('#status-filter-buttons');
-            buttonsContainer.empty();
-
-            for (let status in statusCounts) {
-                let buttonClass = 'btn btn-secondary';
-
-                if (status === 'Проведено') {
-                    buttonClass = 'btn btn-success';
-                }
-
-                buttonsContainer.append(`<button class="${buttonClass} status-filter me-2" data-status="${status}">${status} (${statusCounts[status]})</button>`);
-            }
-
-            $('.status-filter').on('click', function() {
-                const status = $(this).data('status');
-                table.column(2).search(status).draw();
-            });
-        }
-
         updateStatusButtons();
 
         table.on('draw.dt', function() {
@@ -991,6 +1038,8 @@
             var url = '{{ route("write-off.detail", ":writeoff") }}';
             url = url.replace(':writeoff', writeoff);
 
+            console.log(url);
+
             $.ajax({
                 url: url,
                 method: 'GET',
@@ -1000,6 +1049,7 @@
                     $('#editRetailer').val(response.writeOff.retailer);
                     $('#editDate').val(response.writeOff.date);
                     $('#editTotal_weight').val(response.writeOff.total_weight);
+                    $('#editPrice').val(response.writeOff.price);
                     $('#editTotal_amount').val(response.writeOff.total_amount);
                     $('#editExternal').val(response.writeOff.external);
                     $('#editStoreNumber').val(response.writeOff.store_number);
@@ -1127,8 +1177,7 @@
         });
 
         $('#writeOffForm').on('submit', function(event) {
-            event.preventDefault(); // Предотвращаем стандартное поведение формы
-
+            event.preventDefault();
             var formData = $(this).serialize();
 
             $.ajax({
@@ -1178,14 +1227,14 @@
                 $("#bitrix_id").val(selectedData.bitrix_id);
                 $("#retailer").val(selectedData.retailer);
                 $("#date").val(selectedData.date);
-                $("#external").val(selectedData.shop);
+                $("#storeNumber").val(selectedData.shop);
+                $("#price").val(selectedData.price.price);
                 $("#store").val(selectedData.shop_address);
                 $("#counteragent").val(selectedData.client);
 
                 if (!$("#detailToggle").is(':checked')) {
                     $("#detailToggle").trigger('click');
                 }
-
 
                 $("#fruits_price").val(selectedData.price.price_fruits_vegetables || selectedData.price.price);
                 $("#bread_price").val(selectedData.price.price_bakery || selectedData.price.price);
@@ -1316,6 +1365,24 @@
             minLength: 2, // Минимальное количество символов для начала поиска
             select: function(event, ui) {
                 $("#editContract").val(ui.item.value);
+                const selectedData = ui.item.data;
+
+                $("#bitrix_id").val(selectedData.bitrix_id);
+                $("#editRetailer").val(selectedData.retailer);
+                $("#editDate").val(selectedData.date);
+                $("#editPrice").val(selectedData.price.price);
+                $("#editStoreNumber").val(selectedData.shop);
+                $("#editStore").val(selectedData.shop_address);
+                $("#editCounteragent").val(selectedData.client);
+
+                $("#fruits_price_edit").val(selectedData.price.price_fruits_vegetables || selectedData.price.price);
+                $("#bread_price_edit").val(selectedData.price.price_bakery || selectedData.price.price);
+                $("#milk_price_edit").val(selectedData.price.price_dairy || selectedData.price.price);
+                $("#used_vegetable_oil_price_edit").val(selectedData.price.price_used_oil || selectedData.price.price);
+                $("#groceries_price_edit").val(selectedData.price.price_grocery || selectedData.price.price);
+                $("#food_waste_price_edit").val(selectedData.price.price_waste || selectedData.price.price);
+                $("#other_price_edit").val(selectedData.price.other || selectedData.price.price);
+
                 return false;
             },
             open: function(event, ui) {

@@ -164,6 +164,26 @@
 
                 $('.dt-buttons').append(filter);
 
+                // Получаем GET-параметр "filter" из URL
+                function getQueryParameter(name) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get(name);
+                }
+
+                const shopFilter = getQueryParameter('shopFilter');
+                const numberFilter = getQueryParameter('numberFilter');
+
+                // Устанавливаем значения и применяем фильтры, если они есть
+                if (shopFilter) {
+                    $('#shopFilter').val(shopFilter);
+                    table.columns(1).search(shopFilter).draw(); // Применяем фильтр
+                }
+
+                if (numberFilter) {
+                    $('#numberFilter').val(numberFilter);
+                    table.columns(2).search(numberFilter).draw(); // Применяем фильтр
+                }
+
                 $.ajax({
                     url: '{{ route('contract.get.retailers') }}',
                     method: 'GET',

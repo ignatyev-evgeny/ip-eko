@@ -23,6 +23,10 @@ class WriteOffsFindToPassedCommand extends Command {
 
             foreach ($writeOffs as $writeOff) {
 
+                if($writeOff->total_amount <= 0) {
+                    continue;
+                }
+
                 if(empty($writeOff->contract_id)) {
                     continue;
                 }

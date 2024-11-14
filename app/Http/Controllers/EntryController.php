@@ -70,26 +70,32 @@ class EntryController extends Controller {
         ]);
     }
 
-    public function store(EntryStoreRequest $request) {
-        $data = $request->validated();
-        $data['status'] = 'new';
-        $data['uuid'] = Str::uuid()->toString();
-        $entry = Entry::create($data);
+    public function update(Entry $entry, EntryStoreRequest $request)
+    {
 
-        return response()->json([
-            'message' => 'Данные успешно сохранены!',
-            'entry' => $entry,
-        ], 201);
-    }
-
-    public function update(Entry $entry, EntryStoreRequest $request) {
         $data = $request->validated();
+
+        if(empty($data['contract'])) {
+            return response()->json([
+                'message' => 'Договор не указан',
+            ], 404);
+        }
 
         if($entry->status == 'passed') {
             return response()->json([
                 'message' => 'Запрещено редактировать уже проведенное поступление',
             ], 403);
         }
+
+        $contract = Contract::where('title', "like", "%" . getTextAfterFirstDashIfMatched($data['contract']) . "%")->first();
+
+        if(empty($contract)) {
+            return response()->json([
+                'message' => 'Указанный договор - ' . $data['contract'] . ' - не найден',
+            ], 404);
+        }
+
+        $data['contract_id'] = $contract->id;
 
         $entry->update($data);
 
@@ -99,7 +105,14 @@ class EntryController extends Controller {
         ], 201);
     }
 
-    public function transfer(Entry $entry, Request $request) {
+    public function transfer(Entry $entry, Request $request)
+    {
+
+        if($entry->status != 'passed') {
+            return response()->json([
+                'message' => 'Изменять договор в поступлении можно только на проведенном поступлении',
+            ], 404);
+        }
 
         if(empty($request->new_contract)) {
             return response()->json([
@@ -170,7 +183,12 @@ class EntryController extends Controller {
         }
 
         foreach ($request['entries'] as $entry) {
-            Entry::where('id', $entry)->delete();
+
+            if($entry->status == 'passed') {
+                continue;
+            }
+
+            Entry::find($entry)->delete();
         }
 
         return response()->json([
@@ -191,12 +209,11 @@ class EntryController extends Controller {
         try {
 
             foreach ($request['entries'] as $entry) {
-                $entry = Entry::where('id', $entry)->first();
+                $entry = Entry::find($entry);
 
                 if($entry->status == 'passed') {
                     continue;
                 }
-
 
                 if(empty($entry->contract)) {
                     continue;
@@ -258,7 +275,12 @@ class EntryController extends Controller {
                 }
 
                 foreach ($request['entries'] as $entry) {
-                    $entryDetail = Entry::where('id', $entry)->first();
+
+                    if($entry->status == 'passed') {
+                        continue;
+                    }
+
+                    $entryDetail = Entry::find($entry);
                     EntryIgnore::updateOrCreate([
                         'counteragent_bank_account' => $entryDetail->counteragent_bank_account,
                     ], [

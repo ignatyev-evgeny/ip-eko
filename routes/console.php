@@ -17,7 +17,7 @@ Artisan::command('inspire', function () {
 
 Schedule::command(updateAccessTokenCommand::class)->everyMinute();
 Schedule::command(WriteOffsFindToPassedCommand::class)->everyMinute();
-Schedule::command(EntriesFindToPassedCommand::class)->everyMinute();
+//Schedule::command(EntriesFindToPassedCommand::class)->everyMinute();
 Schedule::command(updateAccessTokenSberBankIntegrationCommand::class)->everyFifteenMinutes();
 Schedule::command(getPaymentsFromSberBankCommand::class)->everyTenMinutes();
 Schedule::command(createOrUpdateContractsCommand::class)->everyThirtyMinutes();

@@ -8,6 +8,7 @@ use App\Models\EntryIgnore;
 use App\Models\SberIntegration;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Str;
 
 class getPaymentsFromSberBankCommand extends Command {
     protected $signature = 'integration:get-payments-from-sber-bank {date?}';
@@ -63,6 +64,7 @@ class getPaymentsFromSberBankCommand extends Command {
                         'amount' => $transaction->amountRub->amount,
                         'counteragent' => $transaction->rurTransfer->payerName ?? null,
                         'counteragent_bank_account' => $transaction->rurTransfer->payerAccount ?? null,
+                        'contract_id' => null,
                         'contract' => null,
                         'payment_purpose' => $transaction->paymentPurpose,
                         'operation_type' => null,
@@ -85,12 +87,21 @@ class getPaymentsFromSberBankCommand extends Command {
             });
 
             $filteredEntries = array_map(function($entry) {
+
+                if (Str::contains($entry['payment_purpose'], 'ЗА')) {
+                    $paymentPurpose = explode(';', $entry['payment_purpose'])[3];
+                } else {
+                    $paymentPurpose = $entry['payment_purpose'];
+                }
+
                 //preg_match('/(?<=№)\d+(?=\/)/', $entry['payment_purpose'], $matches);
                 //preg_match('/\d+(?=\/)/', $entry['payment_purpose'], $matches);
-                preg_match('/(?<=\/)\d+(?=\/)/', $entry['payment_purpose'], $matches);
+                preg_match('/(?<=\/)\d+(?=\/)/', $paymentPurpose, $matches);
+
                 if (!empty($matches)) {
                     //$contract = Contract::where('number', $matches[0])->where('status', 'Активный')->first();
                     $contract = Contract::where('number', $matches[0])->first();
+                    $entry['contract_id'] = !empty($contract) ? $contract->id : null;
                     $entry['contract'] = !empty($contract) ? $contract->title : null;
                     $entry['status'] = !empty($contract) ? 'contract' : 'new';
                 }
@@ -110,6 +121,7 @@ class getPaymentsFromSberBankCommand extends Command {
                         'amount',
                         'counteragent',
                         'counteragent_bank_account',
+                        'contract_id',
                         'contract',
                         'payment_purpose',
                         'operation_type'

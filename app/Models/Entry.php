@@ -13,6 +13,7 @@ class Entry extends Model {
         'amount',
         'counteragent',
         'counteragent_bank_account',
+        'contract_id',
         'contract',
         'payment_purpose',
         'operation_type',
