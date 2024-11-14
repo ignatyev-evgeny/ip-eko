@@ -275,9 +275,8 @@
                 </div>
             </div>
         </div>
-
         <div class="modal fade" id="viewModal" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="viewModalLabel">Просмотр</h5>
@@ -287,37 +286,49 @@
                         <form id="viewForm">
                             @csrf
                             <input type="hidden" id="viewId" name="id">
-                            <div class="mb-3">
-                                <label for="viewContract" class="form-label">Договор</label>
-                                <textarea type="text" class="form-control contractInput" style="height: 150px" name="contract" id="viewContract" aria-describedby="contractInput" disabled></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="viewCounteragent" class="form-label">Контрагент (Клиент)</label>
-                                <textarea type="text" class="form-control" name="counteragent" style="height: 100px" id="viewCounteragent" disabled></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="viewCounteragent_bank_account" class="form-label">Контрагент (Клиента) р/с</label>
-                                <input type="text" class="form-control" name="counteragent_bank_account" id="viewCounteragent_bank_account" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label for="viewAmount" class="form-label">Поступило</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" name="amount" id="viewAmount" disabled>
-                                    <span class="input-group-text">₽</span>
-                                    <span class="input-group-text">0.00</span>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="viewContract" class="form-label">Договор</label>
+                                        <textarea type="text" class="form-control contractInput" style="height: 150px" name="contract" id="viewContract" aria-describedby="contractInput" readonly></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="viewCounteragent" class="form-label">Контрагент (Клиент)</label>
+                                        <textarea type="text" class="form-control" name="counteragent" style="height: 100px" id="viewCounteragent" readonly></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="viewAmount" class="form-label">Поступило</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="amount" id="viewAmount" readonly>
+                                            <span class="input-group-text">₽</span>
+                                            <span class="input-group-text">0.00</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="viewDatetime" class="form-label">Дата платежа</label>
+                                        <input type="datetime-local" name="datetime" class="form-control" id="viewDatetime" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="viewNumber" class="form-label">Номер</label>
+                                        <input type="text" class="form-control" name="number" id="viewNumber" readonly>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="viewDatetime" class="form-label">Дата платежа</label>
-                                <input type="datetime-local" name="datetime" class="form-control" id="viewDatetime" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label for="viewNumber" class="form-label">Номер</label>
-                                <input type="text" class="form-control" name="number" id="viewNumber" disabled>
-                            </div>
-                            <div class="mb-3">
-                                <label for="viewPayment_purpose" class="form-label">Назначение платежа</label>
-                                <textarea type="text" class="form-control" style="height: 150px" name="payment_purpose" id="viewPayment_purpose" disabled></textarea>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="viewCounteragent_bank_account" class="form-label">Контрагент (Клиента) р/с</label>
+                                        <input type="text" class="form-control" name="counteragent_bank_account" id="viewCounteragent_bank_account" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="viewPayment_purpose" class="form-label">Назначение платежа</label>
+                                        <textarea type="text" class="form-control" style="height: 150px" name="payment_purpose" id="viewPayment_purpose" readonly></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="newContract" class="form-label">Новый договор</label>
+                                        <textarea type="text" class="form-control contractInput" style="height: 150px;" name="new_contract" id="newContract" aria-describedby="newContract"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100">Перенести платеж</button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -620,6 +631,7 @@
                         $('#viewNumber').val(response.entry.number);
                         $('#viewOperation_type').val(response.entry.operation_type);
                         $('#viewPayment_purpose').val(response.entry.payment_purpose);
+                        $('#newContract').val('');
                         $('#viewModal').modal('show');
                     },
                     error: function(xhr) {
@@ -645,6 +657,28 @@
                     error: function(xhr) {
                         toastr.error(xhr.responseJSON.message);
                         $('#editModal').modal('hide');
+                    }
+                });
+
+            });
+
+            $('#viewForm').on('submit', function(e) {
+                e.preventDefault();
+                var entryID = $('#viewId').val();
+                var url = '{{ route("entry.transfer", ":entryID") }}';
+                url = url.replace(':entryID', entryID);
+
+                $.ajax({
+                    url: url,
+                    method: 'PATCH',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#viewModal').modal('hide');
+                        table.ajax.reload();
+                    },
+                    error: function(xhr) {
+                        toastr.error(xhr.responseJSON.message);
+                        $('#viewModal').modal('hide');
                     }
                 });
 
@@ -731,6 +765,40 @@
                     $(".ui-autocomplete").css("position", "absolute");
                 }
             });
+
+            $("#newContract").autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url: '{{ route('contract.getNames') }}',
+                        dataType: 'json',
+                        data: {
+                            term: request.term
+                        },
+                        success: function(data) {
+                            /** Преобразуем данные так, чтобы каждый элемент содержал `label` (для отображения) и `value` (для использования) */
+                            const results = data.map(item => ({
+                                label: item.title, // Отображаемое значение в списке
+                                value: item.title, // Значение, устанавливаемое в поле при выборе
+                                data: item // Сохраняем весь объект для использования в `select`
+                            }));
+                            response(results);
+                        },
+                        error: function(xhr) {
+                            console.error(xhr.responseText);
+                        }
+                    });
+                },
+                minLength: 2, // Минимальное количество символов для начала поиска
+                select: function(event, ui) {
+                    $("#newContract").val(ui.item.value);
+                    return false;
+                },
+                open: function(event, ui) {
+                    $(".ui-autocomplete").css("z-index", 1056);
+                    $(".ui-autocomplete").css("position", "absolute");
+                }
+            });
+
 
             $('#confirmDelete').click(function() {
                 var selectedRows = table.rows({ selected: true }).data();

@@ -299,7 +299,7 @@
         </div>
     </div>
 
-    <div class="modal fade " id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered3 modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -520,6 +520,42 @@
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-success w-100">Сохранить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="viewModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="viewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered3 modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewModalLabel">Изменение договора</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <form id="viewForm">
+                            @csrf
+                            <input type="hidden" id="viewId" name="id">
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label for="contract" class="form-label">Договор</label>
+                                        <input type="text" class="form-control contractInput" name="contract" id="viewContract" aria-describedby="contractInput" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label for="contract" class="form-label">Новый договор</label>
+                                        <input type="text" class="form-control" name="newContract" id="newViewContract">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">Заменить договор</button>
                         </form>
                     </div>
                 </div>
@@ -1024,6 +1060,28 @@
 
         });
 
+        $('#example tbody').on('click', 'button.viewRow', function(e) {
+            e.stopPropagation();
+            var button = this;
+            var writeoff = $(button).attr('data-write-off-id');
+            var url = '{{ route("write-off.detail", ":writeoff") }}';
+            url = url.replace(':writeoff', writeoff);
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    $('#viewId').val(response.writeOff.id);
+                    $('#viewContract').val(response.writeOff.contract);
+                    $('#viewModal').modal('show');
+                },
+                error: function(xhr) {
+                    console.log(xhr);
+                }
+            });
+
+        });
+
         $('#editForm').on('submit', function(e) {
             e.preventDefault();
             var writeoffID = $('#editId').val();
@@ -1041,6 +1099,28 @@
                 error: function(xhr) {
                     toastr.error(xhr.responseJSON.message);
                     $('#editModal').modal('hide');
+                }
+            });
+
+        });
+
+        $('#viewForm').on('submit', function(e) {
+            e.preventDefault();
+            var writeoffID = $('#viewId').val();
+            var url = '{{ route("write-off.transfer", ":viewId") }}';
+            url = url.replace(':viewId', writeoffID);
+
+            $.ajax({
+                url: url,
+                method: 'PATCH',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#viewModal').modal('hide');
+                    table.ajax.reload();
+                },
+                error: function(xhr) {
+                    toastr.error(xhr.responseJSON.message);
+                    $('#viewModal').modal('hide');
                 }
             });
 
@@ -1236,6 +1316,72 @@
             minLength: 2, // Минимальное количество символов для начала поиска
             select: function(event, ui) {
                 $("#editContract").val(ui.item.value);
+                return false;
+            },
+            open: function(event, ui) {
+                $(".ui-autocomplete").css("z-index", 1056);
+                $(".ui-autocomplete").css("position", "absolute");
+            }
+        });
+
+        $("#viewContract").autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url: '{{ route('contract.getNames') }}',
+                    dataType: 'json',
+                    data: {
+                        term: request.term
+                    },
+                    success: function(data) {
+                        /** Преобразуем данные так, чтобы каждый элемент содержал `label` (для отображения) и `value` (для использования) */
+                        const results = data.map(item => ({
+                            label: item.title, // Отображаемое значение в списке
+                            value: item.title, // Значение, устанавливаемое в поле при выборе
+                            data: item // Сохраняем весь объект для использования в `select`
+                        }));
+                        response(results);
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            },
+            minLength: 2, // Минимальное количество символов для начала поиска
+            select: function(event, ui) {
+                $("#viewContract").val(ui.item.value);
+                return false;
+            },
+            open: function(event, ui) {
+                $(".ui-autocomplete").css("z-index", 1056);
+                $(".ui-autocomplete").css("position", "absolute");
+            }
+        });
+
+        $("#newViewContract").autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url: '{{ route('contract.getNames') }}',
+                    dataType: 'json',
+                    data: {
+                        term: request.term
+                    },
+                    success: function(data) {
+                        /** Преобразуем данные так, чтобы каждый элемент содержал `label` (для отображения) и `value` (для использования) */
+                        const results = data.map(item => ({
+                            label: item.title, // Отображаемое значение в списке
+                            value: item.title, // Значение, устанавливаемое в поле при выборе
+                            data: item // Сохраняем весь объект для использования в `select`
+                        }));
+                        response(results);
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            },
+            minLength: 2, // Минимальное количество символов для начала поиска
+            select: function(event, ui) {
+                $("#newViewContract").val(ui.item.value);
                 return false;
             },
             open: function(event, ui) {

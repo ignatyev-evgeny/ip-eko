@@ -57,6 +57,7 @@
                 <th scope="col">Начальный баланс</th>
                 <th scope="col">Сумма транзакции</th>
                 <th scope="col">Балас после транзакции</th>
+                <th scope="col">Комментарий</th>
                 <th scope="col">Дата транзакции</th>
             </tr>
             </thead>
@@ -68,6 +69,7 @@
                         <td>{{ number_format($transaction->start_balance, 2, '.', ' ') }} ₽</td>
                         <td>{{ number_format($transaction->amount, 2, '.', ' ') }} ₽</td>
                         <td>{{ number_format($transaction->end_balance, 2, '.', ' ') }} ₽</td>
+                        <td>{{ $transaction->comment ?? null }}</td>
                         <td>{{ date('H:i:s d/m/Y', \Carbon\Carbon::parse($transaction->created_at)->timestamp) }} UTC</td>
                     </tr>
                 @endforeach

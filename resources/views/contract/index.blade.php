@@ -42,6 +42,7 @@
             <tr>
                 <th>ID</th>
                 <th>ВН</th>
+                <th>Номер</th>
                 <th>Статус договора</th>
                 <th>Локальный баланс</th>
                 <th></th>
@@ -78,7 +79,7 @@
 
         const table = $('#contracts').DataTable({
             scrollX: true,
-            stateSave: true,
+            stateSave: false,
             pageLength: 100,
             processing: true,
             ajax: '{{ route('contract.data') }}',
@@ -88,41 +89,42 @@
                     text: 'Все',
 
                     action: function () {
-                        table.columns(1).search('').draw();
+                        table.columns(3).search('').draw();
                     }
                 },
                 {
                     text: 'Активные',
                     className: 'btn btn-success',
                     action: function () {
-                        table.columns(1).search('Активный').draw();
+                        table.columns(3).search('Активный').draw();
                     }
                 },
                 {
                     text: 'Закрытые',
                     className: 'btn btn-danger',
                     action: function () {
-                        table.columns(1).search('Закрыт').draw();
+                        table.columns(3).search('Закрыт').draw();
                     }
                 },
                 {
                     text: 'Приостановленные',
                     className: 'btn btn-warning',
                     action: function () {
-                        table.columns(1).search('Приостановлен').draw();
+                        table.columns(3).search('Приостановлен').draw();
                     }
                 },
                 {
                     text: 'Согласование',
                     className: 'btn btn-secondary',
                     action: function () {
-                        table.columns(1).search('Согласование').draw();
+                        table.columns(3).search('Согласование').draw();
                     }
                 }
             ],
             columns: [
                 { data: 'id', className: 'text-center align-middle'},
                 { data: 'shop', className: 'text-center align-middle'},
+                { data: 'number', className: 'text-center align-middle'},
                 { data: 'status', className: 'text-center align-middle'},
                 { data: 'local_balance', className: 'text-center align-middle'},
                 { data: 'balance_history', className: 'text-center align-middle', sortable: false},
@@ -145,13 +147,23 @@
                 url: "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"
             },
             initComplete: function() {
-                // Создаем контейнер для выпадающего списка рядом с кнопками
-                const retailerFilter = `<select id="retailerFilter" class="form-control ml-2 mt-2"><option value="">Без сортировки</option></select>`;
 
-                // Вставляем выпадающий список рядом с кнопками
-                $('.dt-buttons').append(retailerFilter);
+                const filter = `
+                    <div class="row ms-2 mb-1">
+                        <div class="col-4">
+                            <select id="retailerFilter" class="form-control ml-2 mt-2 text-center"><option value="">Без сортировки</option></select>
+                        </div>
+                        <div class="col-4">
+                            <input type="text" id="shopFilter" class="form-control ml-2 mt-2 text-center" placeholder="ВН">
+                        </div>
+                        <div class="col-4">
+                            <input type="text" id="numberFilter" class="form-control ml-2 mt-2 text-center" placeholder="Номер">
+                        </div>
+                    </div>
+                `;
 
-                // Динамическое заполнение выпадающего списка
+                $('.dt-buttons').append(filter);
+
                 $.ajax({
                     url: '{{ route('contract.get.retailers') }}',
                     method: 'GET',
@@ -162,22 +174,19 @@
                     }
                 });
 
-                // Поле для поиска по второму столбцу
-                const shopFilter = `<input type="text" id="shopFilter" class="form-control ml-2 mt-2" placeholder="Поиск по ВН">`;
-
-// Вставляем текстовое поле рядом с кнопками
-                $('.dt-buttons').append(shopFilter);
-
-// Обработчик изменения значения для фильтрации второго столбца
                 $('#shopFilter').on('keyup', function () {
                     const shop = $(this).val();
                     table.columns(1).search(shop).draw();
                 });
 
-                // Обработчик изменения значения для фильтрации
+                $('#numberFilter').on('keyup', function () {
+                    const number = $(this).val();
+                    table.columns(2).search(number).draw();
+                });
+
                 $('#retailerFilter').on('change', function () {
                     const retailer = $(this).val();
-                    table.columns(5).search(retailer).draw();
+                    table.columns(6).search(retailer).draw();
                 });
             }
         });
