@@ -1187,6 +1187,7 @@
                 success: function(response) {
                     toastr.success('Данные успешно отправлены!');
                     table.ajax.reload();
+                    $('#writeOffForm')[0].reset();
                 },
                 error: function(xhr) {
                     toastr.error('Произошла ошибка при отправке данных.');
