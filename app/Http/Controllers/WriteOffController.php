@@ -49,7 +49,14 @@ class WriteOffController extends Controller {
             })
 
             ->addColumn('contract', function($row) {
-                return '<a target="_blank" href="/contract/list?numberFilter=' . $row->contractDetail->number . '">' . $row->contract . '</a>';
+
+                if(!empty($row->contractDetail)) {
+                    $return = '<a target="_blank" href="/contract/list?numberFilter=' . $row->contractDetail->number . '">' . $row->contract . '</a>';
+                } else {
+                    $return = $row->contract;
+                }
+
+                return $return;
             })
 
             ->addColumn('store', function($row) {
