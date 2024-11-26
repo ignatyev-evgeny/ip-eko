@@ -103,4 +103,9 @@ class Contract extends Model {
         return $this->hasMany(ContractsBalanceHistory::class, 'contract_id', 'id');
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class, 'contract_id', 'id');
+    }
+
 }

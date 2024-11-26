@@ -6,6 +6,8 @@ use App\Http\Requests\WriteOffRequest;
 use App\Imports\WriteOffsImport;
 use App\Models\Contract;
 use App\Models\ContractsBalanceHistory;
+use App\Models\Invoice;
+use App\Models\InvoiceWriteOffs;
 use App\Models\WriteOff;
 use Carbon\Carbon;
 use DB;
@@ -391,6 +393,18 @@ class WriteOffController extends Controller {
                     'end_balance' => $balanceSnapshot - $writeoff->total_amount,
                     'comment' => "Отгрузка / {$writeoff->date} / BH {$writeoff->store_number}",
                 ]);
+
+                $invoice = Invoice::firstOrCreate([
+                    'contract_id' => $contract->id,
+                    'generated' => false,
+                    'date_created' => Carbon::now()->toDateTimeString(),
+                ]);
+
+                InvoiceWriteOffs::updateOrCreate([
+                    'invoice_id' => $invoice->id,
+                    'write_off_id' => $writeoff->id,
+                ]);
+
             }
 
             DB::commit();
@@ -448,6 +462,10 @@ class WriteOffController extends Controller {
                         'amount' => $writeoff->total_amount,
                         'end_balance' => $balanceSnapshot + $writeoff->total_amount,
                     ]);
+
+                    InvoiceWriteOffs::where([
+                        'write_off_id' => $writeoff->id,
+                    ])->delete();
 
                 }
 
@@ -511,6 +529,10 @@ class WriteOffController extends Controller {
                         'amount' => $writeoff->total_amount,
                         'end_balance' => $balanceSnapshot + $writeoff->total_amount,
                     ]);
+
+                    InvoiceWriteOffs::where([
+                        'write_off_id' => $writeoff->id,
+                    ])->delete();
 
                 }
 

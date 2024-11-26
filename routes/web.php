@@ -4,6 +4,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\EntryController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\invoicesController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\WriteOffController;
@@ -50,6 +51,10 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
         Route::get('/list', [ClientController::class, 'list'])->name('list');
     });
 
+    Route::name('invoices.')->prefix('invoices')->group(function () {
+        Route::get('/list', [invoicesController::class, 'list'])->name('list');
+    });
+
     Route::name('contract.')->prefix('contract')->group(function () {
         Route::get('/list', [ContractController::class, 'list'])->name('list');
         Route::get('/get-retailers', [ContractController::class, 'getRetailers'])->name('get.retailers');
@@ -57,6 +62,8 @@ Route::withoutMiddleware(VerifyCsrfToken::class)->group(function () {
         Route::get('/getNames', [ContractController::class, 'getNames'])->name('getNames');
         Route::post('/changeBalance', [ContractController::class, 'changeBalance'])->withoutMiddleware(VerifyCsrfToken::class)->name('changeBalance');
         Route::get('/history/{contract}', [ContractController::class, 'history'])->name('history');
+        Route::get('/invoices/{contract}', [ContractController::class, 'invoices'])->name('invoices');
+        Route::get('/invoice/transactions/{invoice}', [ContractController::class, 'invoiceTransactions'])->name('invoice.transactions');
     });
 
 

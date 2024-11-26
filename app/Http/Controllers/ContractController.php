@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Contract;
 use App\Models\ContractsBalanceHistory;
+use App\Models\Invoice;
 use Carbon\Carbon;
 use DB;
 use Exception;
@@ -43,7 +44,10 @@ class ContractController extends Controller {
             })
 
             ->addColumn('balance_history', function($row) {
-                return '<a href="' . route('contract.history', ['contract' => $row->id]) . '"><button type="button" class="btn btn-sm btn-warning">История</button></a>';
+                $buttons = '';
+                $buttons .= '<a href="' . route('contract.history', ['contract' => $row->id]) . '"><button type="button" class="btn btn-sm btn-warning" style="width: 75px">История</button></a><br>';
+                $buttons .= '<a href="' . route('contract.invoices', ['contract' => $row->id]) . '"><button type="button" class="btn btn-sm btn-primary" style="margin-top: 5px;width: 75px">Счета</button></a>';
+                return $buttons;
             })
 
             ->addColumn('price', function($row) {
@@ -180,4 +184,41 @@ class ContractController extends Controller {
             dd($exception);
         }
     }
+
+    public function invoices(Contract $contract, Request $request) {
+        try {
+            $contract->load('invoices');
+            return view('contract.invoices', [
+                'iframe' => $request->server()['HTTP_SEC_FETCH_DEST'] == 'iframe',
+                'contract' => $contract,
+                'invoices' => $contract->invoices
+            ]);
+        } catch (Exception $exception) {
+            report($exception);
+            dd($exception);
+        }
+    }
+
+    public function invoiceTransactions(Invoice $invoice, Request $request) {
+        try {
+            $invoice->load('writeOffs');
+
+            $totalWeight = $invoice->writeOffs->sum(fn($t) => $t->writeOff->total_weight);
+            $totalAmount = $invoice->writeOffs->sum(fn($t) => $t->writeOff->total_amount);
+            $averagePrice = $totalWeight > 0 ? $totalAmount / $totalWeight : 0;
+
+            return view('contract.invoiceTransactions', [
+                'iframe' => $request->server()['HTTP_SEC_FETCH_DEST'] == 'iframe',
+                'invoice' => $invoice,
+                'transactions' => $invoice->writeOffs,
+                'totalWeight' => $totalWeight,
+                'totalAmount' => $totalAmount,
+                'averagePrice' => $averagePrice,
+            ]);
+        } catch (Exception $exception) {
+            report($exception);
+            dd($exception);
+        }
+    }
+
 }

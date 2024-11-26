@@ -4,7 +4,10 @@ namespace App\Console\Commands;
 
 use App\Models\Contract;
 use App\Models\ContractsBalanceHistory;
+use App\Models\Invoice;
+use App\Models\InvoiceWriteOffs;
 use App\Models\WriteOff;
+use Carbon\Carbon;
 use DB;
 use Exception;
 use Illuminate\Console\Command;
@@ -52,6 +55,17 @@ class WriteOffsFindToPassedCommand extends Command {
                     'amount' => -$writeOff->total_amount,
                     'end_balance' => $balanceSnapshot - $writeOff->total_amount,
                     'comment' => "Отгрузка / {$writeOff->date} / BH {$writeOff->store_number}",
+                ]);
+
+                $invoice = Invoice::firstOrCreate([
+                    'contract_id' => $contract->id,
+                    'generated' => false,
+                    'date_created' => Carbon::now()->toDateTimeString(),
+                ]);
+
+                InvoiceWriteOffs::updateOrCreate([
+                    'invoice_id' => $invoice->id,
+                    'write_off_id' => $writeOff->id,
                 ]);
 
             }

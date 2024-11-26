@@ -66,6 +66,7 @@
 {{--            <li class="nav-item"><a href="{{ route('supplier.list') }}" class="nav-link" >Поставщики</a></li>--}}
 {{--            <li class="nav-item"><a href="{{ route('client.list') }}" class="nav-link">Клиенты</a></li>--}}
             <li class="nav-item"><a href="{{ route('contract.list') }}" class="nav-link">Договоры</a></li>
+            <li class="nav-item"><a href="{{ route('invoices.list') }}" class="nav-link">Счета</a></li>
             <li class="nav-item"><a href="{{ route('entry.list') }}" class="nav-link active" aria-current="page">Поступления</a></li>
             <li class="nav-item"><a href="{{ route('write-off.list') }}" class="nav-link">Списания</a></li>
             <li class="nav-item"><a href="{{ route('entry.bank', ['date' => date('Y-m-d')]) }}" target="_blank" class="nav-link">Выписка с банка</a></li>
