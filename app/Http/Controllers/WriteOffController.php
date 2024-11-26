@@ -48,6 +48,10 @@ class WriteOffController extends Controller {
                 return Carbon::parse($row->date)->format('Y-m-d').'<br>'.$row->day_of_week;
             })
 
+            ->addColumn('date_timestamp', function($row) {
+                return Carbon::parse($row->date)->format('Y-m-d');
+            })
+
             ->addColumn('contract', function($row) {
 
                 if(!empty($row->contractDetail)) {

@@ -35,6 +35,42 @@ class WriteOffRequest extends FormRequest {
         ];
     }
 
+    public function messages(): array {
+        return [
+            'external.string' => 'Поле "External" должно быть строкой.',
+            'external.max' => 'Поле "External" не должно превышать 255 символов.',
+            'store_number.string' => 'Поле "Номер магазина" должно быть строкой.',
+            'store_number.max' => 'Поле "Номер магазина" не должно превышать 255 символов.',
+            'store.string' => 'Поле "Магазин" должно быть строкой.',
+            'store.max' => 'Поле "Магазин" не должно превышать 255 символов.',
+            'date.date' => 'Поле "Дата" должно быть валидной датой.',
+            'total_weight.numeric' => 'Поле "Общий вес" должно быть числом.',
+            'total_amount.numeric' => 'Поле "Общая сумма" должно быть числом.',
+            'counteragent.string' => 'Поле "Контрагент" должно быть строкой.',
+            'counteragent.max' => 'Поле "Контрагент" не должно превышать 255 символов.',
+            'contract.string' => 'Поле "Договор" должно быть строкой.',
+            'contract.max' => 'Поле "Договор" не должно превышать 255 символов.',
+            'retailer.string' => 'Поле "Ритейлер" должно быть строкой.',
+            'retailer.max' => 'Поле "Ритейлер" не должно превышать 255 символов.',
+            'fruits_price.numeric' => 'Поле "Цена фруктов" должно быть числом.',
+            'fruits_weight.numeric' => 'Поле "Вес фруктов" должно быть числом.',
+            'bread_price.numeric' => 'Поле "Цена хлеба" должно быть числом.',
+            'bread_weight.numeric' => 'Поле "Вес хлеба" должно быть числом.',
+            'milk_price.numeric' => 'Поле "Цена молока" должно быть числом.',
+            'milk_weight.numeric' => 'Поле "Вес молока" должно быть числом.',
+            'food_waste_price.numeric' => 'Поле "Цена пищевых отходов" должно быть числом.',
+            'food_waste_weight.numeric' => 'Поле "Вес пищевых отходов" должно быть числом.',
+            'used_vegetable_oil_price.numeric' => 'Поле "Цена использованного масла" должно быть числом.',
+            'used_vegetable_oil_weight.numeric' => 'Поле "Вес использованного масла" должно быть числом.',
+            'groceries_price.numeric' => 'Поле "Цена бакалеи" должно быть числом.',
+            'groceries_weight.numeric' => 'Поле "Вес бакалеи" должно быть числом.',
+            'other_price.numeric' => 'Поле "Прочая цена" должно быть числом.',
+            'other_weight.numeric' => 'Поле "Прочий вес" должно быть числом.',
+            'take_contract.string' => 'Поле "Взять договор" должно быть строкой.',
+            'detail_view.string' => 'Поле "Детальный вид" должно быть строкой.',
+        ];
+    }
+
     public function authorize(): bool {
         return true;
     }

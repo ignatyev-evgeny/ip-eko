@@ -126,21 +126,27 @@ class ContractController extends Controller {
             $columnId = $request->input('column');
             $value = $request->input('value');
 
-            $row = Contract::find($rowId);
+            $contract = Contract::find($rowId);
 
-            $balanceSnapshot = $row->local_balance;
+            if(empty($contract)) {
+                return response()->json([
+                    'message' => 'Договор не существует'
+                ], 404);
+            }
+
+            $balanceSnapshot = $contract->local_balance;
 
             switch ($columnId) {
-                case 2:
-                    $row->local_balance = $value;
+                case 4:
+                    $contract->local_balance = $value;
                     break;
             }
 
-            $row->save();
+            $contract->save();
 
             if($balanceSnapshot != $value) {
                 ContractsBalanceHistory::create([
-                    'contract_id' => $rowId,
+                    'contract_id' => $contract->id,
                     'start_balance' => $balanceSnapshot,
                     'amount' => 0,
                     'end_balance' => $value,

@@ -7,11 +7,13 @@ use App\Models\Contract;
 use App\Models\ContractsBalanceHistory;
 use App\Models\Entry;
 use App\Models\EntryIgnore;
+use App\Models\SberIntegration;
 use Carbon\Carbon;
 use DB;
 use Dflydev\DotAccessData\Data;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Str;
 use Throwable;
 use Yajra\DataTables\Facades\DataTables;
@@ -68,6 +70,75 @@ class EntryController extends Controller {
             'message' => 'Данные успешно получены!',
             'entry' => $entry,
         ]);
+    }
+
+    public function bank(string $date)
+    {
+        try {
+
+            $date = empty($date) ? date('Y-m-d') : $date;
+            $integration = SberIntegration::find(1);
+
+            if (empty($integration->access_token)) {
+                abort(404, 'access_token - не определен');
+            }
+
+            $allTransactions = [];
+            $page = 1;
+
+            do {
+
+                $response = Http::withToken($integration->access_token)
+                    ->withOptions([
+                        'cert' => '/var/www/ip-eko.bitrix.expert/html/storage/crt/SBBAPI_9672_7953ec3e-1851-4411-b953-5fd5d168cdc5.pem', '0328Dima',
+                        'verify' => false,
+                    ])
+                    ->get('https://fintech.sberbank.ru:9443/fintech/api/v2/statement/transactions', [
+                        'accountNumber' => '40802810828000050817',
+                        'statementDate' => $date,
+                        'page' => $page
+                    ]);
+
+                if ($response->status() === 400) {
+                    break;
+                }
+
+                if (!$response->successful()) {
+                    abort(500, 'Ошибка при соединении с https://fintech.sberbank.ru:9443/fintech/api/v2/statement/transactions. Status: ' . $response->status()." | ".$response->body());
+                }
+
+                $data = $response->object();
+
+                if (empty($data->transactions)) {
+                    break;
+                }
+
+                $allTransactions = array_merge($allTransactions, $data->transactions);
+
+                $page++;
+            } while (!empty($data->transactions));
+
+            if (empty($allTransactions)) {
+                abort(500, 'Транзакции отсутствуют за указанную дату');
+            }
+
+            $transactions = array_filter($allTransactions, function ($transaction) {
+                return isset($transaction->direction) && $transaction->direction === 'CREDIT';
+            });
+
+            $transactions = array_map(function ($transaction) {
+                $transaction->is_found = Entry::where('uuid', $transaction->uuid)->exists();
+                return $transaction;
+            }, $transactions);
+
+            return view('entry.bank', [
+                'transactions' => $transactions,
+                'total' => count($transactions)
+            ]);
+
+        } catch (Exception $exception) {
+            dd($exception);
+        }
     }
 
     public function update(Entry $entry, EntryStoreRequest $request)

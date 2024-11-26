@@ -117,7 +117,7 @@
                         <div class="col-3">
                             <div class="mb-3">
                                 <label for="date" class="form-label">Дата</label>
-                                <input type="date" name="date" class="form-control" id="date">
+                                <input type="date" name="date" class="form-control" id="date" value="{{ date('Y-m-d') }}">
                             </div>
                         </div>
                         <div class="col-3">
@@ -828,7 +828,8 @@
                 { data: 'actions', sortable: false, className: 'text-center align-middle' },
                 { data: 'status', sortable: false, className: 'text-center align-middle' },
                 // { data: 'external', sortable: false, visible: false, className: 'text-center align-middle' },
-                { data: 'date', className: 'text-center align-middle' },
+                { data: 'date', className: 'text-center align-middle', orderData: [4] },
+                { data: 'date_timestamp', visible:false, className: 'text-center align-middle' },
                 { data: 'comment', className: 'text-center align-middle', defaultContent: '' },
                 { data: 'store', sortable: false, className: 'text-center align-middle' },
                 { data: 'total_weight', sortable: false, className: 'text-center align-middle' },
@@ -1190,8 +1191,8 @@
                     $('#writeOffForm')[0].reset();
                 },
                 error: function(xhr) {
-                    toastr.error('Произошла ошибка при отправке данных.');
-                    console.error(xhr.responseText);
+                    toastr.error(xhr.responseJSON.message);
+                    console.error(xhr);
                 }
             });
         });
@@ -1227,7 +1228,6 @@
                 const selectedData = ui.item.data;
                 $("#bitrix_id").val(selectedData.bitrix_id);
                 $("#retailer").val(selectedData.retailer);
-                $("#date").val(selectedData.date);
                 $("#storeNumber").val(selectedData.shop);
                 $("#price").val(selectedData.price.price);
                 $("#store").val(selectedData.shop_address);

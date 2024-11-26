@@ -33,7 +33,7 @@
                         <!-- Блок текста с балансом по центру -->
                         <div class="balance-section text-center" style="flex-grow: 1;">
                             <span id="balance-display">{{ number_format($contract->local_balance, 2, '.', ' ') }} ₽</span>
-                            <input type="number" id="balance-input" value="{{ $contract->local_balance }}" style="display:none; width: 300px; text-align:center;height: 24px;">
+                            <input type="text" id="balance-input" value="{{ $contract->local_balance }}" style="display:none; width: 300px; text-align:center;height: 24px;">
                             <input type="hidden" id="contract" value="{{ $contract->id }}">
 
                         </div>
@@ -95,9 +95,9 @@
             value = value.replace(/[^0-9.-]/g, '');
 
             // Удаляем все точки, кроме первой
-            if (value.includes('.')) {
-                value = value.replace(/\.(?=.*\.)/, '');
-            }
+            // if (value.includes('.')) {
+            //     value = value.replace(/\.(?=.*\.)/, '');
+            // }
 
             // Удаляем все минусы, кроме первого и только если он в начале
             if (value.includes('-')) {
@@ -119,7 +119,7 @@
                 method: 'POST',
                 data: {
                     row: contract,
-                    column: 2,
+                    column: 4,
                     value: newBalance,
                 },
                 success: function(response) {
@@ -149,7 +149,7 @@
                 method: 'POST',
                 data: {
                     row: contract,
-                    column: 2,
+                    column: 4,
                     value: 0,
                 },
                 success: function(response) {

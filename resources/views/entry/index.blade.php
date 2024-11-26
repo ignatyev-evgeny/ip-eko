@@ -68,6 +68,7 @@
             <li class="nav-item"><a href="{{ route('contract.list') }}" class="nav-link">Договоры</a></li>
             <li class="nav-item"><a href="{{ route('entry.list') }}" class="nav-link active" aria-current="page">Поступления</a></li>
             <li class="nav-item"><a href="{{ route('write-off.list') }}" class="nav-link">Списания</a></li>
+            <li class="nav-item"><a href="{{ route('entry.bank', ['date' => date('Y-m-d')]) }}" target="_blank" class="nav-link">Выписка с банка</a></li>
         </ul>
     </header>
 </div>
@@ -684,25 +685,25 @@
 
             });
 
-            $('#entryForm').on('submit', function(event) {
-                event.preventDefault(); // Предотвращаем стандартное поведение формы
+            {{--$('#entryForm').on('submit', function(event) {--}}
+            {{--    event.preventDefault(); // Предотвращаем стандартное поведение формы--}}
 
-                var formData = $(this).serialize();
+            {{--    var formData = $(this).serialize();--}}
 
-                $.ajax({
-                    url: '{{ route('entry.store') }}',
-                    method: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        toastr.success('Данные успешно отправлены!');
-                        table.ajax.reload();
-                    },
-                    error: function(xhr) {
-                        toastr.error('Произошла ошибка при отправке данных.');
-                        console.error(xhr.responseText);
-                    }
-                });
-            });
+            {{--    $.ajax({--}}
+            {{--        url: '{{ route('entry.store') }}',--}}
+            {{--        method: 'POST',--}}
+            {{--        data: formData,--}}
+            {{--        success: function(response) {--}}
+            {{--            toastr.success('Данные успешно отправлены!');--}}
+            {{--            table.ajax.reload();--}}
+            {{--        },--}}
+            {{--        error: function(xhr) {--}}
+            {{--            toastr.error('Произошла ошибка при отправке данных.');--}}
+            {{--            console.error(xhr.responseText);--}}
+            {{--        }--}}
+            {{--    });--}}
+            {{--});--}}
 
             $("#contract").autocomplete({
                 source: function(request, response) {

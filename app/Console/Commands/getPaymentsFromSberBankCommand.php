@@ -26,35 +26,53 @@ class getPaymentsFromSberBankCommand extends Command {
             return;
         }
 
-        $response = Http::withToken($integration->access_token)
-            ->withOptions([
-                'cert' => '/var/www/ip-eko.bitrix.expert/html/storage/crt/SBBAPI_9672_7953ec3e-1851-4411-b953-5fd5d168cdc5.pem', '0328Dima',
-                'verify' => false,
-            ])
-            ->get('https://fintech.sberbank.ru:9443/fintech/api/v2/statement/transactions', [
-                'accountNumber' => '40802810828000050817',
-                'statementDate' => $date,
-        ]);
+        $allTransactions = [];
+        $page = 1;
 
-        if(!$response->successful()) {
-            $this->errorLog('Ошибка при соединении с https://fintech.sberbank.ru:9443/fintech/api/v2/statement/transactions. Status: ' . $response->status());
-            return;
-        }
+        do {
 
-        $data = $response->object();
+            $response = Http::withToken($integration->access_token)
+                ->withOptions([
+                    'cert' => '/var/www/ip-eko.bitrix.expert/html/storage/crt/SBBAPI_9672_7953ec3e-1851-4411-b953-5fd5d168cdc5.pem', '0328Dima',
+                    'verify' => false,
+                ])
+                ->get('https://fintech.sberbank.ru:9443/fintech/api/v2/statement/transactions', [
+                    'accountNumber' => '40802810828000050817',
+                    'statementDate' => $date,
+                    'page' => $page
+                ]);
 
-        if(empty($data->transactions)) {
-            $this->errorLog('Ошибка при получении transactions');
-            return;
+            if ($response->status() === 400) {
+                break;
+            }
+
+            if (!$response->successful()) {
+                abort(500, 'Ошибка при соединении с https://fintech.sberbank.ru:9443/fintech/api/v2/statement/transactions. Status: ' . $response->status()." | ".$response->body());
+            }
+
+            $data = $response->object();
+
+            if (empty($data->transactions)) {
+                break;
+            }
+
+            $allTransactions = array_merge($allTransactions, $data->transactions);
+
+            $page++;
+
+        } while (!empty($data->transactions));
+
+        if (empty($allTransactions)) {
+            abort(500, 'Транзакции отсутствуют за указанную дату');
         }
 
         $entries = [];
 
-        foreach ($data->transactions as $transaction) {
+        foreach ($allTransactions as $transaction) {
 
             if (!empty($transaction->direction) && $transaction->direction == "CREDIT") {
 
-                if(empty(EntryIgnore::where('counteragent', $transaction->rurTransfer->payerName)->count()) && empty(EntryIgnore::where('counteragent_bank_account', $transaction->rurTransfer->payerName)->count())) {
+                if(empty(EntryIgnore::where('counteragent', $transaction->rurTransfer->payerName)->count()) && empty(EntryIgnore::where('counteragent_bank_account', $transaction->rurTransfer->payerAccount)->count())) {
 
                     $entries[] = [
                         'uuid' => $transaction->uuid,
@@ -88,7 +106,7 @@ class getPaymentsFromSberBankCommand extends Command {
 
             $filteredEntries = array_map(function($entry) {
 
-                if (Str::contains($entry['payment_purpose'], 'ЗА')) {
+                if (Str::startsWith($entry['payment_purpose'], 'ЗА ')) {
                     $paymentPurpose = explode(';', $entry['payment_purpose'])[3];
                 } else {
                     $paymentPurpose = $entry['payment_purpose'];

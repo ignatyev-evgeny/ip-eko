@@ -141,7 +141,7 @@
                 { data: 'other', className: 'text-center align-middle'},
             ],
             createdRow: function(row, data, dataIndex) {
-                //$(row).find('td:eq(2)').attr('contenteditable', 'true');  // Делаем редактируемой только 2-ю колонку (local_balance)
+                $(row).find('td:eq(4)').attr('contenteditable', 'true');  // Делаем редактируемой только 2-ю колонку (local_balance)
             },
             language: {
                 url: "//cdn.datatables.net/plug-ins/1.10.24/i18n/Russian.json"
@@ -241,10 +241,10 @@
                 return false;
             }
 
-            // Минус можно вводить только в начале
-            if (charCode === 45 && $(this).text().length > 0) {
-                return false;
-            }
+            // // Минус можно вводить только в начале
+            // if (charCode === 45 && $(this).text().length > 0) {
+            //     return false;
+            // }
 
             return true;
         });
@@ -285,19 +285,6 @@
             table.search(searchTerm).draw();
         }
 
-        table.on('mouseenter', 'td', function () {
-            let colIdx = table.cell(this).index().column;
-
-            table
-                .cells()
-                .nodes()
-                .each((el) => el.classList.remove('highlight'));
-
-            table
-                .column(colIdx)
-                .nodes()
-                .each((el) => el.classList.add('highlight'));
-        });
 
     });
 
