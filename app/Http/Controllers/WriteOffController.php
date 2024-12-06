@@ -396,7 +396,8 @@ class WriteOffController extends Controller {
 
                 $invoice = Invoice::firstOrCreate([
                     'contract_id' => $contract->id,
-                    'generated' => false,
+                    'generated' => false
+                ], [
                     'date_created' => Carbon::now()->toDateTimeString(),
                 ]);
 

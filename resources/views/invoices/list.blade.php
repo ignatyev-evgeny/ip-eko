@@ -42,9 +42,11 @@
                     <td class="text-center align-middle" >{{ $invoice->date_generated ? \Carbon\Carbon::parse($invoice->date_generated)->format("d-m-Y H:i:s") : "-//-" }}</td>
                     <td class="text-center align-middle" >{{ $invoice->date_sent ? \Carbon\Carbon::parse($invoice->date_sent)->format("d-m-Y H:i:s") : "-//-" }}</td>
                     <td class="text-center align-middle" >
-                        <a href="{{ route('contract.invoice.transactions', ['invoice' => $invoice->id]) }}"><button type="button" class="btn btn-sm btn-warning" style="width: 150px">Транзакции</button></a><br>
-                        <button type="button" disabled class="btn btn-sm btn-primary" style="width: 150px;margin-top: 5px">Счет</button><br>
-                        <button type="button" disabled class="btn btn-sm btn-dark" style="width: 150px;margin-top: 5px">Сгенерировать</button><br>
+                        <a target="_blank" href="{{ route('contract.invoice.transactions', ['invoice' => $invoice->id]) }}"><button type="button" class="btn btn-sm btn-warning" style="width: 150px">Транзакции</button></a><br>
+                        <a target="_blank" href="{{ route('invoices.generate', ['invoice' => $invoice->id, 'generate' => 'false']) }}"><button type="button" class="btn btn-sm btn-primary" style="width: 150px;margin-top: 5px">Счет (Просмотр)</button></a><br>
+                        @empty($invoice->date_generated )
+                            <a target="_blank" href="{{ route('invoices.generate', ['invoice' => $invoice->id, 'generate' => 'true']) }}"><button type="button" class="btn btn-sm btn-dark" style="width: 150px;margin-top: 5px">Сгенерировать</button></a><br>
+                        @endempty
                         <button type="button" disabled class="btn btn-sm btn-success" style="width: 150px;margin-top: 5px">Отправить</button>
                     </td>
                 </tr>
