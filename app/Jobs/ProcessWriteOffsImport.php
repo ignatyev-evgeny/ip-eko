@@ -95,7 +95,7 @@ class ProcessWriteOffsImport implements ShouldQueue
 
                     $weight['total'] = floatval($weight['fruits']) + floatval($weight['bread']) + floatval($weight['milk']) + floatval($weight['other']) + floatval($weight['used_oil']);
 
-                    $date = Carbon::parse($row['data_provodki'])->format('Y-m-d'); // Ваша дата в формате Y-m-d
+                    $date = Carbon::createFromFormat('d/m/Y', $row['data_provodki'])->format('Y-m-d'); // Ваша дата в формате Y-m-d
                     Carbon::setLocale('ru');
                     $carbonDate = Carbon::parse($date);
                     $dayOfWeek = mb_ucfirst($carbonDate->translatedFormat('l'));
@@ -182,6 +182,7 @@ class ProcessWriteOffsImport implements ShouldQueue
             if ($this->supplierType == 'CROSSROAD') {
 
                 foreach ($importData as $value) {
+
                     $writeOff = WriteOff::firstOrCreate($value['find'], $value['create']);
 
                     if ($writeOff->wasRecentlyCreated) {

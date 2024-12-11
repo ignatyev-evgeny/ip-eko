@@ -1371,7 +1371,6 @@
 
                 $("#bitrix_id").val(selectedData.bitrix_id);
                 $("#editRetailer").val(selectedData.retailer);
-                $("#editDate").val(selectedData.date);
                 $("#editPrice").val(selectedData.price.price);
                 $("#editStoreNumber").val(selectedData.shop);
                 $("#editStore").val(selectedData.shop_address);

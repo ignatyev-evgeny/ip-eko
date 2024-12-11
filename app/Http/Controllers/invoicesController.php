@@ -40,6 +40,8 @@ class invoicesController extends Controller {
                 return (float) $item['total_amount'];
             });
 
+            $totalAmountSum = number_format($totalAmountSum, 2, '.', '');
+
             $reason = $invoice->contract->shop.'/'.$invoice->contract->number.'/'.$invoice->contract->client;
 
             $strQRCode = 'ST00012|Name=ИП Кучаев Дмитрий Николаевич|PersonalAcc=40802810828000050817|BankName=Коми отделение №8617  ПАО "Сбербанк"|BIC=048702640|CorrespAcc=30101810400000000640|PayeeINN=110112027200|KPP=|persAcc=';
@@ -55,6 +57,7 @@ class invoicesController extends Controller {
                 'invoice_reason' => $reason,
                 'strQRCode' => mb_convert_encoding($strQRCode, 'UTF-8', 'auto'),
                 'stamp_link' => asset('assets/img/invoice/stamp.png'),
+                'logo_link' => asset('assets/img/logo.png'),
                 'items' => [
                     [
                         'id' => 1,

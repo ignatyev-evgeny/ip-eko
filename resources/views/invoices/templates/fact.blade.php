@@ -52,7 +52,7 @@
             <span style="text-align: left;font-size: 10px;"><i>Получатель</i></span>
         </td>
         <td colspan="2" rowspan="2" style="padding: 5px;text-align: center">
-            <img src="data:image/png;base64, {!! base64_encode(QrCode::style('dot')->encoding('UTF-8')->format('png')->size(200)->generate($strQRCode)) !!} ">
+            <img src="data:image/png;base64, {!! base64_encode(QrCode::encoding('UTF-8')->format('png')->size(200)->generate($strQRCode)) !!} ">
         </td>
     </tr>
     <tr>

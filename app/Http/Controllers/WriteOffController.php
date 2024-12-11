@@ -13,8 +13,10 @@ use Carbon\Carbon;
 use DB;
 use Exception;
 use Illuminate\Http\Request;
+use Log;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Storage;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -559,54 +561,83 @@ class WriteOffController extends Controller {
 
     public function upload(Request $request)
     {
-        // Валидация загруженного файла
         $request->validate([
             'supplierType' => 'required|string',
             'file' => 'required|file|mimes:csv,txt,xls,xlsx',
         ]);
 
-        $file = $request->file('file');
-        $supplierType = $request->input('supplierType');
-        $filePath = $file->getRealPath();
+        try {
 
-        // Проверяем, существует ли директория `converted_files`, если нет, создаем её
-        $directory = storage_path('app/converted_files');
-        if (!file_exists($directory)) {
-            mkdir($directory, 0777, true);
+            $file = $request->file('file');
+            $supplierType = $request->input('supplierType');
+            $filePath = $file->getRealPath();
+
+            $tempDirectory = storage_path('app/converted_files');
+            if (!file_exists($tempDirectory)) {
+                mkdir($tempDirectory, 0777, true);
+            }
+
+            $csvFilePath = $tempDirectory . '/' . pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.csv';
+
+            if (in_array($file->getClientOriginalExtension(), ['xls', 'xlsx'])) {
+
+                $reader = IOFactory::createReader('Xlsx');
+                $reader->setReadDataOnly(true);
+                $spreadsheet = $reader->load($filePath);
+                $worksheet = $spreadsheet->getActiveSheet();
+
+                $csvFile = fopen($csvFilePath, 'w');
+                foreach ($worksheet->getRowIterator() as $row) {
+                    $rowData = [];
+                    foreach ($row->getCellIterator() as $cell) {
+                        $value = $cell->getValue();
+
+                        // Проверяем, что текущая колонка - это "A"
+                        if ($cell->getColumn() === 'A') {
+                            if (is_numeric($value)) {
+                                try {
+                                    // Преобразуем числовую дату в читаемый формат
+                                    $value = Date::excelToDateTimeObject($value)->format('d/m/Y');
+                                } catch (\Exception $e) {
+                                    // Если значение не удаётся преобразовать, оставляем как есть
+                                }
+                            }
+                        }
+
+                        $rowData[] = $value;
+                    }
+                    fputcsv($csvFile, $rowData, ';');
+                }
+                fclose($csvFile);
+
+                $filePath = $csvFilePath;
+            }
+
+            Excel::import(new WriteOffsImport($supplierType), $filePath, null, \Maatwebsite\Excel\Excel::CSV, [
+                'delimiter' => ';',
+                'enclosure' => '"',
+                'escape_character' => '\\',
+            ]);
+
+            if (file_exists($csvFilePath)) {
+                unlink($csvFilePath);
+            }
+
+            return response()->json([
+                'message' => 'Файл успешно поставлен в очередь на обработку.',
+            ], 201);
+
+        } catch (Exception $exception) {
+            Log::error('Ошибка при обработке файла: ' . $exception->getMessage(), [
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+            ]);
+
+            return response()->json([
+                'message' => 'Произошла ошибка при обработке файла.',
+                'error' => $exception->getMessage(),
+            ], 500);
         }
-
-        // Если файл - Excel, конвертируем его в CSV
-        if (in_array($file->getClientOriginalExtension(), ['xls', 'xlsx'])) {
-            $spreadsheet = IOFactory::load($filePath);
-
-            // Определяем путь для временного CSV-файла
-            $csvFilePath = 'converted_files/' . pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . '.csv';
-
-            // Создаем Writer для CSV и сохраняем в `storage/app/converted_files`
-            $writer = IOFactory::createWriter($spreadsheet, 'Csv');
-            $writer->setDelimiter(';');
-            $writer->setEnclosure('"');
-            $writer->save(storage_path('app/' . $csvFilePath));
-
-            // Путь к файлу, который будет импортирован
-            $filePath = storage_path('app/' . $csvFilePath);
-        }
-
-        // Импортируем CSV файл
-        Excel::import(new WriteOffsImport($supplierType), $filePath, null, \Maatwebsite\Excel\Excel::CSV, [
-            'delimiter' => ';',
-            'enclosure' => '"',
-            'escape_character' => '\\',
-        ]);
-
-        // Удаляем временный CSV файл после импорта, если он был создан
-        if (isset($csvFilePath)) {
-            Storage::delete('app/' . $csvFilePath);
-        }
-
-        return response()->json([
-            'message' => 'Файл успешно поставлен в очередь на обработку.',
-        ], 201);
     }
 
     public function comment(Request $request, WriteOff $writeoff)
