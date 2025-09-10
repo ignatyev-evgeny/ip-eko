@@ -1,66 +1,209 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# IP-EKO - Система управления договорами и финансовыми операциями
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+IP-EKO — это Laravel-приложение для управления договорами, поступлениями платежей, списаниями и интеграциями с внешними системами (Bitrix24, СберБанк).
 
-## About Laravel
+## 🚀 Особенности
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Управление договорами** - полный жизненный цикл договоров с клиентами
+- **Финансовые операции** - обработка поступлений и списаний
+- **Интеграция с Bitrix24** - синхронизация данных о договорах, клиентах и поставщиках
+- **Интеграция со СберБанк** - автоматическое получение банковских операций
+- **Генерация счетов** - создание PDF-счетов с QR-кодами для оплаты
+- **Система балансов** - отслеживание локальных балансов договоров
+- **Импорт данных** - загрузка списаний из Excel/CSV файлов
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📋 Требования
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2+
+- Laravel 11.x
+- SQLite/MySQL
+- Composer
+- Node.js (для фронтенда)
 
-## Learning Laravel
+## 🛠 Установка
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. **Клонирование репозитория**
+   ```bash
+   git clone <repository-url>
+   cd ip-eko
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+2. **Установка зависимостей**
+   ```bash
+   composer install
+   npm install
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. **Настройка окружения**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## Laravel Sponsors
+4. **Настройка базы данных**
+   ```bash
+   # Для SQLite (по умолчанию)
+   touch database/database.sqlite
+   
+   # Или настройте MySQL в .env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=ip_eko
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+5. **Миграции**
+   ```bash
+   php artisan migrate
+   ```
 
-### Premium Partners
+6. **Сборка фронтенда**
+   ```bash
+   npm run build
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## ⚙️ Конфигурация
 
-## Contributing
+### Интеграция с Bitrix24
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Добавьте в `.env`:
+```env
+# config/services.php уже содержит настройки
+BITRIX24_CLIENT_ID=your_client_id
+BITRIX24_CLIENT_SECRET=your_client_secret
+```
 
-## Code of Conduct
+### Интеграция со СберБанк
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1. Разместите сертификат в `/storage/crt/`
+2. Настройте параметры в базе данных через интерфейс приложения
 
-## Security Vulnerabilities
+## 🎯 Основной функционал
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Договоры
+- Создание и управление договорами
+- Отслеживание балансов
+- История операций
+- Генерация счетов
 
-## License
+### Поступления
+- Автоматическое получение от СберБанк
+- Ручное добавление
+- Привязка к договорам
+- Система игнорирования
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Списания
+- Ручное создание
+- Импорт из Excel/CSV
+- Поддержка различных поставщиков (Перекресток, ВЦР, БИО)
+- Детализация по категориям товаров
+
+### Счета
+- Автоматическое создание на основе списаний
+- PDF-генерация с QR-кодами
+- Интеграция с СБП
+
+## 🔄 Автоматизация
+
+Приложение включает несколько команд для автоматизации:
+
+```bash
+# Обновление токенов Bitrix24
+php artisan bitrix:update-access-token
+
+# Получение платежей от СберБанк
+php artisan integration:get-payments-from-sber-bank
+
+# Синхронизация договоров
+php artisan contracts:create-or-update
+
+# Проведение найденных поступлений
+php artisan entries:find-to-passed
+
+# Проведение найденных списаний
+php artisan writeoffs:find-to-passed
+```
+
+### Планировщик задач
+
+В `routes/console.php` настроены автоматические задачи:
+- Обновление токенов каждую минуту
+- Получение платежей каждые 10 минут
+- Синхронизация данных каждые 30 минут
+
+Для запуска планировщика:
+```bash
+php artisan schedule:work
+```
+
+## 🖥 Интерфейс
+
+Приложение предоставляет веб-интерфейс с:
+- DataTables для удобного просмотра данных
+- Модальные окна для редактирования
+- Автодополнение для договоров
+- Фильтрация и поиск
+- Массовые операции
+
+### Основные разделы:
+- `/` - Главная страница со статистикой
+- `/contract/list` - Управление договорами
+- `/entry/list` - Поступления платежей
+- `/write-off/list` - Списания
+- `/invoices/list` - Счета
+
+## 🔧 Команды разработки
+
+```bash
+# Запуск сервера разработки
+php artisan serve
+
+# Сборка фронтенда в режиме разработки
+npm run dev
+
+# Очистка кэша
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+```
+
+## 📁 Структура проекта
+
+```
+app/
+├── Console/Commands/     # Команды автоматизации
+├── Http/Controllers/     # Контроллеры
+├── Models/              # Модели данных
+├── Jobs/                # Фоновые задачи
+└── Imports/             # Классы импорта Excel
+
+resources/views/         # Шаблоны интерфейса
+├── contract/           # Управление договорами
+├── entry/              # Поступления
+├── writeOff/           # Списания
+└── invoices/           # Счета
+
+database/migrations/     # Миграции базы данных
+```
+
+## 🔒 Безопасность
+
+- CSRF-защита для всех форм
+- Валидация входящих данных
+- Безопасная работа с файлами
+- Шифрование чувствительных данных
+
+## 🤝 Интеграции
+
+### Bitrix24
+- Получение договоров (смарт-процесс 172)
+- Синхронизация клиентов (смарт-процесс 180)
+- Получение поставщиков (смарт-процесс 164)
+- Встраивание виджета в интерфейс Bitrix24
+
+### СберБанк API
+- Получение банковских операций
+- Автоматическое обновление токенов
+- Обработка различных типов платежей
